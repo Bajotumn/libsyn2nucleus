@@ -18,17 +18,48 @@ const cheerio = require("cheerio"),
   jsonfile = require("jsonfile"),
   fs = require("fs"),
   readline = require("readline-sync"),
-  nucleus = require("./nucleus.js");
+  nucleus = require("./nucleus.js"),
+  jsonBody = require("body/json");
 
 (async () => {
-  console.log("Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***");
-  var username = readline.questionEMail("Email: ");
-  var password = readline.question(`Password for "${username}": `, {hideEchoBack: true});
-  let nucleusApi = new nucleus(username,password);
+  console.log(
+    "Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***"
+  );
+  let username, password;
+  // Try/Catch to workaround reading from tty in debug
+  try {
+    username = readline.questionEMail("Email: ");
+    password = readline.question(`Password for "${username}": `, {
+      hideEchoBack: true
+    });
+  } catch (error) {
+    if (fs.existsSync(__dirname + "/auth.cfg")) {
+      let auth = fs.readFileSync(__dirname + "/auth.cfg").toString();
+      auth = auth.split("\n");
+      username = auth[0];
+      password = auth[1];
+    }
+  }
+  let nucleusApi = new nucleus(username, password);
   nucleusApi.login().then(loggedIn => {
-    if(!loggedIn){
+    if (!loggedIn) {
       process.exit();
     }
+    nucleusApi
+      .uploadAudioFile({
+        item_title: "God's Glory Alone | John 17:1-5, 20-26",
+        item_body_clean: "God's Glory Alone | John 17:1-5, 20-26 ",
+        item_body: "<p>God's Glory Alone | John 17:1-5, 20-26</p>\n",
+        image_url: "https://assets.libsyn.com/secure/content/17514154",
+        url: "http://traffic.libsyn.com/preview/mosaicabq/102917Mosaic.mp3"
+      })
+      .then(r => {
+        jsonBody(r, (err, body) => {
+          console.log("Upload got response: ");
+          console.dir(body);
+        });
+      });
+    /*
     let subdomain = readline.question(
       'Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": '
     );
@@ -62,6 +93,7 @@ const cheerio = require("cheerio"),
     } else {
       database = jsonfile.readFileSync(databaseFile);
     }
+    */
   });
 })();
 function getCategoryItems_sync(url, category) {
