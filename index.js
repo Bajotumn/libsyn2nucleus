@@ -1,0 +1,172 @@
+/**
+ * 1) Categories =  mosaicabq.libsyn.com/website > .widget-categories > ul > li*
+ * 2) Category JSON = while(http://mosaicabq.libsyn.com/page/${i}/category/${category}/render-type/json != null) +=
+ * 3) foreach (category in categories) {foreach (item in category) {create sermon series; download/stream to nucleus; add image; set information; }}
+ */
+
+/**
+ **    item_title: "New World | Revelation 21:1-8",
+ **    release_date: "Feb 19, 2017",
+ **    item_body_clean: "Heaven will always be a boring and pointless place until Jesus becomes a bright and priceless prize to you. ",
+ **    image_url: "http://assets.libsyn.com/content/16270964",
+ **    primary_content: {
+ **                    url: "http://traffic.libsyn.com/mosaicabq/New_World___Revelation_21_1-82-19-2017.mp3?dest-id=549729",
+ **    }
+ */
+const cheerio = require("cheerio"),
+  request = require("sync-request"),
+  jsonfile = require("jsonfile"),
+  fs = require("fs"),
+  readline = require("readline-sync"),
+  nucleus = require("./nucleus.js");
+
+(async () => {
+  console.log("Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***");
+  var username = readline.questionEMail("Email: ");
+  var password = readline.question(`Password for "${username}": `, {hideEchoBack: true});
+  let nucleusApi = new nucleus(username,password);
+  nucleusApi.login().then(loggedIn => {
+    if(!loggedIn){
+      process.exit();
+    }
+    let subdomain = readline.question(
+      'Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": '
+    );
+    console.log(
+      `Got it! Let's migrate your sermons from ${subdomain}.libsyn.com to Nucleus`
+    );
+    let database = {};
+    let databaseFile = `${__dirname}/database/${subdomain}.json`;
+    let useCache = true;
+    if (fs.existsSync(databaseFile)) {
+      useCache = readline.keyInYN("Cached database found on disk. Use it? ");
+    }
+    if (useCache === false) {
+      let libsynURL = `https://${subdomain}.libsyn.com/`;
+      let categories = getCategories_sync(libsynURL);
+
+      console.log(`Found ${categories.length} categories`);
+      console.time("Retrieve database from libsyn");
+      if (categories.length > 0) {
+        categories.forEach(category => {
+          database[category] = {
+            items: getCategoryItems_sync(libsynURL, category)
+          };
+        });
+      } else {
+        database = { items: getCategoryItems_sync(libsynURL, "") };
+      }
+
+      console.timeEnd("Retrieve database from libsyn");
+      jsonfile.writeFileSync(databaseFile, database);
+    } else {
+      database = jsonfile.readFileSync(databaseFile);
+    }
+  });
+})();
+function getCategoryItems_sync(url, category) {
+  let res,
+    i = 1,
+    body;
+  let fulljson = JSON.parse("[ ]");
+  //console.log("Getting ", category, " items...");
+  do {
+    res = request("GET", url + "page/" + i + category + "/render-type/json");
+
+    if (!res.error && res.statusCode === 200) {
+      body = res.getBody();
+      if (body.length > 4) {
+        let j = JSON.parse(body);
+        j.forEach(stripAttributes);
+        fulljson.push(...j);
+        i++;
+      }
+    }
+  } while (body.length > 4);
+  console.log(category, "[" + fulljson.length, "items]");
+  return fulljson;
+}
+/*
+item_id: 6427146,
+premium_state: "free",
+item_slug: "exodus-628-77",
+item_title: "Exodus 6:28-7:7",
+release_date: "Mar 25, 2018",
+comment_count: 0,
+item_body_clean: "Exodus 6:28-7:7 ",
+item_body: "<p>Exodus 6:28-7:7</p> ",
+item_body_short: "<p>Exodus 6:28-7:7</p> ",
+full_item_url: "https://mosaicabq.libsyn.com/exodus-628-77",
+image_content_id: 20078133,
+web_image_content_id: null,
+image_url: "https://assets.libsyn.com/secure/content/20078133",
+primary_content: {
+file_class: "audio",
+content_type: "Standard",
+url: "https://traffic.libsyn.com/secure/mosaicabq/32518Mosaic.mp3?dest-id=549729",
+url_secure: "http://traffic.libsyn.com/preview/mosaicabq/32518Mosaic.mp3",
+content_title: ""
+},
+player: "<iframe id="embed_6427146" title="Exodus 6:28-7:7" style="border: none" src="//html5-player.libsyn.com/embed/episode/id/6427146/height/90/theme/custom/autoplay/no/autonext/no/thumbnail/yes/preload/no/no_addthis/no/direction/forward/tdest_id/549729/render-playlist/no/custom-color/ffffff/" height="90" width="100%" scrolling="no" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>",
+extra_content: [ ],
+display_download_link: true
+*/
+function stripAttributes(j) {
+  let url = j.primary_content.url_secure;
+  j.url = url;
+  delete j.item_id;
+  delete j.premium_state;
+  delete j.item_slug;
+  delete j.release_date;
+  delete j.comment_count;
+  delete j.item_body_short;
+  delete j.full_item_url;
+  delete j.image_content_id;
+  delete j.web_image_content_id;
+  delete j.primary_content;
+  delete j.player;
+  delete j.extra_content;
+  delete j.display_download_link;
+}
+function getCategories_sync(url) {
+  console.time("Retrieve categories from libsyn");
+  let categories = new Array();
+  let categoriesRegEx = /<a href="([^"]+)/g;
+  let res = request("GET", url + "website");
+  if (!res.error && res.statusCode === 200) {
+    let $ = cheerio.load(res.getBody());
+    let cathtml = $(".widget-categories > ul").html();
+    let match;
+    do {
+      match = categoriesRegEx.exec(cathtml);
+      if (match) {
+        categories.push(match[1]);
+      }
+    } while (match);
+  } else {
+    console.log(`Error = ${res.error} code = ${res.statusCode}`);
+  }
+  console.timeEnd("Retrieve categories from libsyn");
+  return categories;
+}
+
+async function getCategories(url) {
+  let categories = new Array();
+  let categoriesRegEx = /<a href="([^"]+)/g;
+  request(url + "website", (error, response, body) => {
+    if (!error && response.statusCode === 200) {
+      let $ = cheerio.load(body);
+      let cathtml = $(".widget-categories > ul").html();
+      let match;
+      do {
+        match = categoriesRegEx.exec(cathtml);
+        if (match) {
+          categories.push(match[1]);
+        }
+      } while (match);
+    } else {
+      console.log(`Error = ${error} code = ${response.statusCode}`);
+    }
+  });
+  return categories;
+}
