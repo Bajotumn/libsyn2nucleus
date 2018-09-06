@@ -18,8 +18,7 @@ const cheerio = require("cheerio"),
   jsonfile = require("jsonfile"),
   fs = require("fs"),
   readline = require("readline-sync"),
-  nucleus = require("./nucleus.js"),
-  jsonBody = require("body/json");
+  nucleus = require("./nucleus.js");
 
 (async () => {
   console.log(
@@ -35,6 +34,7 @@ const cheerio = require("cheerio"),
   } catch (error) {
     if (fs.existsSync(__dirname + "/auth.cfg")) {
       let auth = fs.readFileSync(__dirname + "/auth.cfg").toString();
+      console.log('Loaded dev username/password from ./auth.cfg');
       auth = auth.split("\n");
       username = auth[0];
       password = auth[1];
@@ -45,21 +45,29 @@ const cheerio = require("cheerio"),
     if (!loggedIn) {
       process.exit();
     }
-    nucleusApi
-      .uploadAudioFile({
-        item_title: "God's Glory Alone | John 17:1-5, 20-26",
-        item_body_clean: "God's Glory Alone | John 17:1-5, 20-26 ",
-        item_body: "<p>God's Glory Alone | John 17:1-5, 20-26</p>\n",
-        image_url: "https://assets.libsyn.com/secure/content/17514154",
-        url: "http://traffic.libsyn.com/preview/mosaicabq/102917Mosaic.mp3"
-      })
-      .then(r => {
-        jsonBody(r, (err, body) => {
-          console.log("Upload got response: ");
-          console.dir(body);
+    let testSource = {
+      item_title: "God's Glory Alone | John 17:1-5, 20-26",
+      item_body_clean: "God's Glory Alone | John 17:1-5, 20-26 ",
+      item_body: "<p>God's Glory Alone | John 17:1-5, 20-26</p>\n",
+      image_url: "https://assets.libsyn.com/secure/content/17514154",
+      url: "http://traffic.libsyn.com/preview/mosaicabq/102917Mosaic.mp3"
+    };
+
+    nucleusApi.uploadAudioFile(testSource.url).then(body => {
+      console.log("Upload got response: ");
+      console.dir(body);
+      let itemID = body.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
+      let imageID = "";
+      nucleusApi.uploadImage(testSource.image_url).then(body => {
+        imageID = body.path;
+        console.log(`imageID: ${imageID}`);
+        nucleusApi.editItem(itemID, testSource, imageID).then(response => {
+          console.dir("Response from media edit", response);
         });
       });
-    /*
+    });
+  });
+  /*
     let subdomain = readline.question(
       'Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": '
     );
@@ -94,7 +102,6 @@ const cheerio = require("cheerio"),
       database = jsonfile.readFileSync(databaseFile);
     }
     */
-  });
 })();
 function getCategoryItems_sync(url, category) {
   let res,
@@ -149,7 +156,6 @@ function stripAttributes(j) {
   delete j.item_id;
   delete j.premium_state;
   delete j.item_slug;
-  delete j.release_date;
   delete j.comment_count;
   delete j.item_body_short;
   delete j.full_item_url;
