@@ -148,7 +148,9 @@ class nucleus {
         if (res.statusCode === 200) {
           if (body.length > 4) {
             let $ = cheerio.load(body);
-            resolve($('meta[name="csrf-token"]').attr("content"));
+            let tkn = $('meta[name="csrf-token"]').attr("content");
+            console.log(`Got token (${tkn}) from ${url}`);
+            resolve(tkn);
           }
         }
       });
