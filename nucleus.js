@@ -157,9 +157,13 @@ class nucleus {
     });
   }
   async editItem(itemID, sourceObj, imageID) {
-    let csrfToken = await this.getCSRFToken(
+    /*let csrfToken = await this.getCSRFToken(
       NUCLEUSROOT + ENDPOINTS.edit + "/" + itemID + "?status=new"
     );
+    */
+    let pubDate = new Date(sourceObj.release_date)
+      .toISOString()
+      .match(/([\d]{4}-[\d]{2}-[\d]{2})/)[0] + " 12:00:00";
     return new Promise((resolve, reject) => {
       this.request2.post(
         NUCLEUSROOT + ENDPOINTS.edit,
@@ -172,17 +176,16 @@ class nucleus {
             referer: NUCLEUSROOT + "/admin/media/edit",
             "cache-control": "no-cache",
             accept: "application/json",
-            "x-csrf-token": csrfToken
+            "x-csrf-token": this.csrf_token
           },
           json: true,
           body: {
             mediaItem: {
-              /*
               id: itemID, //"1916"
               sermon_engine_id: 244,
               title: sourceObj.item_title, //"God's Glory Alone | John 17:1-5, 20-26"
               description: sourceObj.item_body_clean, //"God's Glory Alone | John 17:1-5, 20-26 "
-              published_at: "2017-10-29 21:07:34",
+              published_at: pubDate, //"2017-10-29 01:00:00",
               artwork: imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
               scriptures: [
                 {
@@ -203,41 +206,6 @@ class nucleus {
               files: [],
               tags: []
             }
-            */
-              id: 2069,
-              sermon_engine_id: 244,
-              title: "God's Glory Alone | John 17:1-5, 20-26 .",
-              description: null,
-              published_at: "2017-10-29 21:07:34",
-              source: "uploads/46d81a76fb1a4639437254470ff1521905054a3e.mp3", //from <mediaitemeditor media-item-json=...
-              artwork: "uploads/a5f8b4bf1c95f551cda8151d1dc4bc9f92e7a9e6.jpg", //from uploadImage() response
-              deleted_at: null,
-              created_at: "2018-09-06 10:38:39",
-              updated_at: "2018-09-06 10:38:39",
-              filename: "102917Mosaic.mp3",
-              file_size: 34601857,
-              slug: null,
-              source_type: "hosted-audio",
-              scriptures: [
-                {
-                  bible_version_id: 13,
-                  bible_book_id: 43,
-                  chapter: "17",
-                  verses: "1-5"
-                },
-                {
-                  bible_version_id: 13,
-                  bible_book_id: 43,
-                  chapter: "17",
-                  verses: "20-26"
-                }
-              ],
-              files: [],
-              tags: [],
-              speakers: ["Adam Viramontes"],
-              podcasts: [],
-              added_to_podcast: false
-            }
           }
         },
         function(err, res, body) {
@@ -251,27 +219,15 @@ class nucleus {
     });
   }
   uploadAudioFile(fileSource) {
-    return new Promise(resolve => {
-      resolve({ location: "/admin/media/edit/2069?status=new" });
-    });
-    return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio, {
-      applyToken: true
-    }).then(body => {
+    return this._postFormData(
+      fileSource,
+      "audiofile",
+      ENDPOINTS.upload.audio
+    ).then(body => {
       return JSON.parse(body);
     });
   }
   async uploadImage(imageSource) {
-    return new Promise(resolve => {
-      resolve({
-        class: "success",
-        errors: "false",
-        filename: "102917Mosaic.jpg",
-        filesize: 321481,
-        message: "Image successfully uploaded!",
-        path: "uploads/a5f8b4bf1c95f551cda8151d1dc4bc9f92e7a9e6.jpg"
-      });
-    });
-
     let newImageSource = await this.getRedirectUrl(imageSource);
     return this._postFormData(
       newImageSource,
@@ -297,7 +253,7 @@ class nucleus {
    * @param {object} params applyToken: add token to form, fileName: override filename, contentType: override Content-Type form header
    */
   async _postFormData(sourceURL, formName, endpoint, params) {
-    let csrfToken = await this.getCSRFToken(NUCLEUSROOT + "/admin/media");
+    //let csrfToken = await this.getCSRFToken(NUCLEUSROOT + "/admin/media"); //Possibly not necessary
     let formData = new FormData();
     let srcStream = require("request")(sourceURL, {
       followRedirect: true,
@@ -328,8 +284,7 @@ class nucleus {
 
     let cookie = this.cookiejar.getCookieString(NUCLEUSROOT);
     let headers = Object.assign({
-      "x-xsrf-token": this.csrf_token, //I assume this should always be included...
-      "x-csrf-token": csrfToken,
+      "x-csrf-token": this.csrf_token,
       cookie: cookie
     });
 
@@ -378,16 +333,6 @@ class nucleus {
         },
         body: form
       }).then(response => {
-        let htmlPath = `${__dirname}/temp/__${
-          response.statusCode
-        }__${new Date().toISOString()}.html`;
-        fs.writeFileSync(htmlPath, response.body);
-        console.log(
-          `Response Received with status [${
-            response.statusCode
-          }] html written at ${htmlPath}`
-        );
-
         if (response.statusCode === 302 || response.statusCode === 200) {
           //302 redirect means login succeded
           let $ = cheerio.load(response.body);

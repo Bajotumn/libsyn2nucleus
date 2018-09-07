@@ -21,9 +21,7 @@ const cheerio = require("cheerio"),
   nucleus = require("./nucleus.js");
 
 (async () => {
-  console.log(
-    "Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***"
-  );
+  console.log("Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***");
   let username, password;
   if (fs.existsSync(__dirname + "/auth.cfg")) {
     let auth = fs.readFileSync(__dirname + "/auth.cfg").toString();
@@ -47,43 +45,60 @@ const cheerio = require("cheerio"),
       process.exit();
     }
     let testSource = {
-      item_title: "God's Glory Alone | John 17:1-5, 20-26",
-      item_body_clean: "God's Glory Alone | John 17:1-5, 20-26 ",
-      item_body: "<p>God's Glory Alone | John 17:1-5, 20-26</p>\n",
-      image_url: "https://assets.libsyn.com/secure/content/17514154",
-      url: "http://traffic.libsyn.com/preview/mosaicabq/102917Mosaic.mp3"
+      item_title: "Christ Alone | John 14:1-14",
+      release_date: "Oct 15, 2017",
+      item_body_clean: "Christ Alone | John 14:1-14 ",
+      item_body: "<p>Christ Alone | John 14:1-14</p>\n",
+      image_url: "https://assets.libsyn.com/secure/content/17310625",
+      url: "http://traffic.libsyn.com/preview/mosaicabq/101517-_Mosaic.mp3"
     };
     /*
-    nucleusApi.editItem("1587", "", "").then(response => {
-      console.dir("Response from media edit", response);
-    });
-    */
-    
-    nucleusApi.uploadAudioFile(testSource.url).then(abody => {
-      console.log("Upload got response: ");
-      console.dir(abody);
-      let itemID = abody.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
-      let imageID = "";
-      nucleusApi.uploadImage(testSource.image_url).then(ibody => {
-        imageID = ibody.path;
-        console.log(`imageID: ${imageID}`);
-        nucleusApi.editItem(itemID, testSource, imageID).then(response => {
-          console.dir("Response from media edit", response);
-        }).catch(err => {
-          console.error(err);
-        });
+    nucleusApi
+      .editItem(
+        2076,
+        testSource,
+        "uploads/b10b15f770de512fb7533cf8c16cf56640e56bd7.jpg"
+      )
+      .then(response => {
+        console.dir("Response from media edit", response);
+      })
+      .catch(err => {
+        console.error(err);
       });
-    });
-    
-  });
+      */
+    /*
+                 nucleusApi
+                   .uploadAudioFile(testSource.url)
+                   .then(abody => {
+                     console.log("Upload got response: ");
+                     console.dir(abody);
+                     let itemID = abody.location.match(
+                       /\/admin\/media\/edit\/([\d]+)/
+                     )[1];
+                     let imageID = "";
+                     nucleusApi
+                       .uploadImage(testSource.image_url)
+                       .then(ibody => {
+                         imageID = ibody.path;
+                         console.log(`imageID: ${imageID}`);
+                         nucleusApi
+                           .editItem(itemID, testSource, imageID)
+                           .then(response => {
+                             console.dir(
+                               "Response from media edit",
+                               response
+                             );
+                           })
+                           .catch(err => {
+                             console.error(err);
+                           });
+                       });
+                   });
+               });
+*/
 
-  /*
-    let subdomain = readline.question(
-      'Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": '
-    );
-    console.log(
-      `Got it! Let's migrate your sermons from ${subdomain}.libsyn.com to Nucleus`
-    );
+    let subdomain = readline.question('Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
+    console.log(`Got it! Let's migrate your sermons from ${subdomain}.libsyn.com to Nucleus`);
     let database = {};
     let databaseFile = `${__dirname}/database/${subdomain}.json`;
     let useCache = true;
@@ -91,18 +106,33 @@ const cheerio = require("cheerio"),
       useCache = readline.keyInYN("Cached database found on disk. Use it? ");
     }
     if (useCache === false) {
+      let addSeriesImages = false;
       let libsynURL = `https://${subdomain}.libsyn.com/`;
       let categories = getCategories_sync(libsynURL);
 
       console.log(`Found ${categories.length} categories`);
-      console.time("Retrieve database from libsyn");
+
       if (categories.length > 0) {
+        if (readline.keyInYN(`Would you like to define artwork for these ${categories.length} categories? `)) {
+          categories.forEach(category => {
+            let catUrl = '';
+            let urlWorks = true;
+            do{
+              catUrl = readline.question(`Enter url for "${category}": `);
+              urlWorks = urlOk(catUrl);
+              if(!urlWorks){
+                console.log("That url didn't seem to work, please try again.");
+              }
+            }while(!urlWorks);
+            database[category] = { artwork: catUrl };
+          });
+        }
+        console.time("Retrieve database from libsyn");
         categories.forEach(category => {
-          database[category] = {
-            items: getCategoryItems_sync(libsynURL, category)
-          };
+          database[category] = database[category] || { items: getCategoryItems_sync(libsynURL, category) };
         });
       } else {
+        //console.time("Retrieve database from libsyn");
         database = { items: getCategoryItems_sync(libsynURL, "") };
       }
 
@@ -111,8 +141,12 @@ const cheerio = require("cheerio"),
     } else {
       database = jsonfile.readFileSync(databaseFile);
     }
-    */
+  });
 })();
+function urlOk(url){
+  let res = request(url);
+  return (res.statusCode === 200 || res.statusCode === 302 || res.statusCode === 301);
+}
 function getCategoryItems_sync(url, category) {
   let res,
     i = 1,
