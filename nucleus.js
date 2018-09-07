@@ -176,8 +176,8 @@ class nucleus {
           },
           json: true,
           body: {
-            /*
             mediaItem: {
+              /*
               id: itemID, //"1916"
               sermon_engine_id: 244,
               title: sourceObj.item_title, //"God's Glory Alone | John 17:1-5, 20-26"
@@ -204,39 +204,40 @@ class nucleus {
               tags: []
             }
             */
-            id: 1916,
-            sermon_engine_id: 244,
-            title: "God's Glory Alone | John 17:1-5, 20-26 .",
-            description: null,
-            published_at: "2017-10-29 21:07:34",
-            source: "uploads/340c3ea10ad1368adb3ec18969afac0322d25881.mp3",
-            artwork: "uploads/1b56789e44c9c08949f195f9727f7b1cec9825dd.jpg",
-            deleted_at: null,
-            created_at: "2018-09-06 20:38:39",
-            updated_at: "2018-09-06 20:38:39",
-            filename: "102917Mosaic.mp3",
-            file_size: 34601857,
-            slug: null,
-            source_type: "hosted-audio",
-            scriptures: [
-              {
-                bible_version_id: 13,
-                bible_book_id: 43,
-                chapter: "17",
-                verses: "1-5"
-              },
-              {
-                bible_version_id: 13,
-                bible_book_id: 43,
-                chapter: "17",
-                verses: "20-26"
-              }
-            ],
-            files: [],
-            tags: [],
-            speakers: ["Adam Viramontes"],
-            podcasts: [],
-            added_to_podcast: false
+              id: 2069,
+              sermon_engine_id: 244,
+              title: "God's Glory Alone | John 17:1-5, 20-26 .",
+              description: null,
+              published_at: "2017-10-29 21:07:34",
+              source: "uploads/46d81a76fb1a4639437254470ff1521905054a3e.mp3", //from <mediaitemeditor media-item-json=...
+              artwork: "uploads/a5f8b4bf1c95f551cda8151d1dc4bc9f92e7a9e6.jpg", //from uploadImage() response
+              deleted_at: null,
+              created_at: "2018-09-06 10:38:39",
+              updated_at: "2018-09-06 10:38:39",
+              filename: "102917Mosaic.mp3",
+              file_size: 34601857,
+              slug: null,
+              source_type: "hosted-audio",
+              scriptures: [
+                {
+                  bible_version_id: 13,
+                  bible_book_id: 43,
+                  chapter: "17",
+                  verses: "1-5"
+                },
+                {
+                  bible_version_id: 13,
+                  bible_book_id: 43,
+                  chapter: "17",
+                  verses: "20-26"
+                }
+              ],
+              files: [],
+              tags: [],
+              speakers: ["Adam Viramontes"],
+              podcasts: [],
+              added_to_podcast: false
+            }
           }
         },
         function(err, res, body) {
@@ -250,6 +251,9 @@ class nucleus {
     });
   }
   uploadAudioFile(fileSource) {
+    return new Promise(resolve => {
+      resolve({ location: "/admin/media/edit/2069?status=new" });
+    });
     return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio, {
       applyToken: true
     }).then(body => {
@@ -257,8 +261,25 @@ class nucleus {
     });
   }
   async uploadImage(imageSource) {
+    return new Promise(resolve => {
+      resolve({
+        class: "success",
+        errors: "false",
+        filename: "102917Mosaic.jpg",
+        filesize: 321481,
+        message: "Image successfully uploaded!",
+        path: "uploads/a5f8b4bf1c95f551cda8151d1dc4bc9f92e7a9e6.jpg"
+      });
+    });
+
     let newImageSource = await this.getRedirectUrl(imageSource);
-    return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image);
+    return this._postFormData(
+      newImageSource,
+      "image",
+      ENDPOINTS.upload.image
+    ).then(body => {
+      return JSON.parse(body);
+    });
   }
   getRedirectUrl(url) {
     return new Promise(resolve => {
@@ -276,9 +297,7 @@ class nucleus {
    * @param {object} params applyToken: add token to form, fileName: override filename, contentType: override Content-Type form header
    */
   async _postFormData(sourceURL, formName, endpoint, params) {
-    let csrfToken = await this.getCSRFToken(
-      NUCLEUSROOT + '/admin/media'
-    );
+    let csrfToken = await this.getCSRFToken(NUCLEUSROOT + "/admin/media");
     let formData = new FormData();
     let srcStream = require("request")(sourceURL, {
       followRedirect: true,

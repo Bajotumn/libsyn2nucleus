@@ -1,0 +1,810 @@
+{
+  "versions": [
+    {
+      "id": 1,
+      "name": "American Standard Version",
+      "bible_com_id": "12",
+      "bible_com_abbreviation": "ASV"
+    },
+    {
+      "id": 2,
+      "name": "Amplified Bible",
+      "bible_com_id": "1588",
+      "bible_com_abbreviation": "AMP"
+    },
+    {
+      "id": 3,
+      "name": "Amplified Bible, Classic Edition",
+      "bible_com_id": "8",
+      "bible_com_abbreviation": "AMPC"
+    },
+    {
+      "id": 4,
+      "name": "Catholic Public Domain Version",
+      "bible_com_id": "42",
+      "bible_com_abbreviation": "CPDV"
+    },
+    {
+      "id": 5,
+      "name": "Christian Standard Bible",
+      "bible_com_id": "1713",
+      "bible_com_abbreviation": "CSB"
+    },
+    {
+      "id": 6,
+      "name": "Common English Bible",
+      "bible_com_id": "37",
+      "bible_com_abbreviation": "CEB"
+    },
+    {
+      "id": 7,
+      "name": "Complete Jewish Bible",
+      "bible_com_id": "1275",
+      "bible_com_abbreviation": "CJB"
+    },
+    {
+      "id": 8,
+      "name": "Contemporary English Version (Anglicised)",
+      "bible_com_id": "294",
+      "bible_com_abbreviation": "CEVDC"
+    },
+    {
+      "id": 9,
+      "name": "Contemporary English Version (British Edition) 2012",
+      "bible_com_id": "303",
+      "bible_com_abbreviation": "CEVUK"
+    },
+    {
+      "id": 10,
+      "name": "Contemporary English Version",
+      "bible_com_id": "392",
+      "bible_com_abbreviation": "CEV"
+    },
+    {
+      "id": 11,
+      "name": "Darby Translation 1890",
+      "bible_com_id": "478",
+      "bible_com_abbreviation": "DARBY"
+    },
+    {
+      "id": 12,
+      "name": "Douay-Rheims Challoner Revision 1752",
+      "bible_com_id": "55",
+      "bible_com_abbreviation": "DRC1752"
+    },
+    {
+      "id": 13,
+      "name": "English Standard Version",
+      "bible_com_id": "59",
+      "bible_com_abbreviation": "ESV"
+    },
+    {
+      "id": 14,
+      "name": "Free Bible Version",
+      "bible_com_id": "1932",
+      "bible_com_abbreviation": "FBV"
+    },
+    {
+      "id": 15,
+      "name": "GOD'S WORD Translation",
+      "bible_com_id": "70",
+      "bible_com_abbreviation": "GW"
+    },
+    {
+      "id": 16,
+      "name": "Good News Bible (Anglicised)",
+      "bible_com_id": "296",
+      "bible_com_abbreviation": "GNBDC"
+    },
+    {
+      "id": 17,
+      "name": "Good News Bible (Catholic edition in Septuagint order)",
+      "bible_com_id": "416",
+      "bible_com_abbreviation": "GNBDK"
+    },
+    {
+      "id": 18,
+      "name": "Good News Bible",
+      "bible_com_id": "431",
+      "bible_com_abbreviation": "GNB"
+    },
+    {
+      "id": 19,
+      "name": "Good News Translation (US Version)",
+      "bible_com_id": "68",
+      "bible_com_abbreviation": "GNTD"
+    },
+    {
+      "id": 20,
+      "name": "Good News Translation",
+      "bible_com_id": "69",
+      "bible_com_abbreviation": "GNT"
+    },
+    {
+      "id": 21,
+      "name": "Holman Christian Standard Bible",
+      "bible_com_id": "72",
+      "bible_com_abbreviation": "HCSB"
+    },
+    {
+      "id": 22,
+      "name": "Holy Bible: Easy-to-Read Version",
+      "bible_com_id": "406",
+      "bible_com_abbreviation": "ERV"
+    },
+    {
+      "id": 23,
+      "name": "International Children\u2019s Bible",
+      "bible_com_id": "1359",
+      "bible_com_abbreviation": "ICB"
+    },
+    {
+      "id": 24,
+      "name": "Jubilee Bible",
+      "bible_com_id": "1077",
+      "bible_com_abbreviation": "JUB"
+    },
+    {
+      "id": 25,
+      "name": "King James Version with Apocrypha, American Edition",
+      "bible_com_id": "1",
+      "bible_com_abbreviation": "KJVA"
+    },
+    {
+      "id": 26,
+      "name": "King James Version",
+      "bible_com_id": "546",
+      "bible_com_abbreviation": "KJV"
+    },
+    {
+      "id": 27,
+      "name": "King James Version, American Edition",
+      "bible_com_id": "547",
+      "bible_com_abbreviation": "KJVA"
+    },
+    {
+      "id": 28,
+      "name": "Lexham English Bible",
+      "bible_com_id": "90",
+      "bible_com_abbreviation": "LEB"
+    },
+    {
+      "id": 29,
+      "name": "Metrical Psalms 1650",
+      "bible_com_id": "1365",
+      "bible_com_abbreviation": "MP1650"
+    },
+    {
+      "id": 30,
+      "name": "Modern English Version",
+      "bible_com_id": "1171",
+      "bible_com_abbreviation": "MEV"
+    },
+    {
+      "id": 31,
+      "name": "New American Bible, revised edition",
+      "bible_com_id": "463",
+      "bible_com_abbreviation": "NABRE"
+    },
+    {
+      "id": 32,
+      "name": "New American Standard Bible",
+      "bible_com_id": "100",
+      "bible_com_abbreviation": "NASB"
+    },
+    {
+      "id": 33,
+      "name": "New Century Version",
+      "bible_com_id": "105",
+      "bible_com_abbreviation": "NCV"
+    },
+    {
+      "id": 34,
+      "name": "New English Translation",
+      "bible_com_id": "107",
+      "bible_com_abbreviation": "NET"
+    },
+    {
+      "id": 35,
+      "name": "New International Reader's Version",
+      "bible_com_id": "110",
+      "bible_com_abbreviation": "NIRV"
+    },
+    {
+      "id": 36,
+      "name": "New International Version (Anglicised)",
+      "bible_com_id": "113",
+      "bible_com_abbreviation": "NIVUK"
+    },
+    {
+      "id": 37,
+      "name": "New International Version",
+      "bible_com_id": "111",
+      "bible_com_abbreviation": "NIV"
+    },
+    {
+      "id": 38,
+      "name": "New King James Version",
+      "bible_com_id": "114",
+      "bible_com_abbreviation": "NKJV"
+    },
+    {
+      "id": 39,
+      "name": "New Living Translation",
+      "bible_com_id": "116",
+      "bible_com_abbreviation": "NLT"
+    },
+    {
+      "id": 40,
+      "name": "New Revised Standard Version Catholic Interconfessional",
+      "bible_com_id": "2016",
+      "bible_com_abbreviation": "NRSV"
+    },
+    {
+      "id": 41,
+      "name": "New Revised Standard Version",
+      "bible_com_id": "2015",
+      "bible_com_abbreviation": "NRSV"
+    },
+    {
+      "id": 42,
+      "name": "Orthodox Jewish Bible",
+      "bible_com_id": "130",
+      "bible_com_abbreviation": "OJB"
+    },
+    {
+      "id": 43,
+      "name": "Revised Standard Version (RSV-CI)",
+      "bible_com_id": "2017",
+      "bible_com_abbreviation": "RSV"
+    },
+    {
+      "id": 44,
+      "name": "Revised Standard Version",
+      "bible_com_id": "2020",
+      "bible_com_abbreviation": "RSV"
+    },
+    {
+      "id": 45,
+      "name": "Revised Version 1885",
+      "bible_com_id": "477",
+      "bible_com_abbreviation": "RV1885"
+    },
+    {
+      "id": 46,
+      "name": "Revised Version with Apocrypha 1895",
+      "bible_com_id": "1922",
+      "bible_com_abbreviation": "RV1895"
+    },
+    {
+      "id": 47,
+      "name": "St Paul from the Trenches 1916",
+      "bible_com_id": "1047",
+      "bible_com_abbreviation": "GWC"
+    },
+    {
+      "id": 48,
+      "name": "The Books of the Bible NT",
+      "bible_com_id": "31",
+      "bible_com_abbreviation": "BOOKS"
+    },
+    {
+      "id": 49,
+      "name": "The Message",
+      "bible_com_id": "97",
+      "bible_com_abbreviation": "MSG"
+    },
+    {
+      "id": 50,
+      "name": "The Passion Translation",
+      "bible_com_id": "1849",
+      "bible_com_abbreviation": "TPT"
+    },
+    {
+      "id": 51,
+      "name": "The Scriptures 2009",
+      "bible_com_id": "316",
+      "bible_com_abbreviation": "TS2009"
+    },
+    {
+      "id": 52,
+      "name": "Tree of Life Version",
+      "bible_com_id": "314",
+      "bible_com_abbreviation": "TLV"
+    },
+    {
+      "id": 53,
+      "name": "World English Bible British Edition",
+      "bible_com_id": "206",
+      "bible_com_abbreviation": "WEBBE"
+    },
+    {
+      "id": 54,
+      "name": "World English Bible",
+      "bible_com_id": "1204",
+      "bible_com_abbreviation": "WEB"
+    },
+    {
+      "id": 55,
+      "name": "World Messianic Bible British Edition",
+      "bible_com_id": "1209",
+      "bible_com_abbreviation": "WMBBE"
+    },
+    {
+      "id": 56,
+      "name": "World Messianic Bible",
+      "bible_com_id": "1207",
+      "bible_com_abbreviation": "WMB"
+    },
+    {
+      "id": 57,
+      "name": "Young's Literal Translation 3rd Revision 1898",
+      "bible_com_id": "821",
+      "bible_com_abbreviation": "YLT1898"
+    }
+  ],
+  "books": [
+    {
+      "id": 1,
+      "slug": "genesis",
+      "name": "Genesis",
+      "chapters": 50,
+      "bible_com_id": "GEN"
+    },
+    {
+      "id": 2,
+      "slug": "exodus",
+      "name": "Exodus",
+      "chapters": 40,
+      "bible_com_id": "EXO"
+    },
+    {
+      "id": 3,
+      "slug": "leviticus",
+      "name": "Leviticus",
+      "chapters": 27,
+      "bible_com_id": "LEV"
+    },
+    {
+      "id": 4,
+      "slug": "numbers",
+      "name": "Numbers",
+      "chapters": 36,
+      "bible_com_id": "NUM"
+    },
+    {
+      "id": 5,
+      "slug": "deuteronomy",
+      "name": "Deuteronomy",
+      "chapters": 34,
+      "bible_com_id": "DEU"
+    },
+    {
+      "id": 6,
+      "slug": "joshua",
+      "name": "Joshua",
+      "chapters": 24,
+      "bible_com_id": "JOS"
+    },
+    {
+      "id": 7,
+      "slug": "judges",
+      "name": "Judges",
+      "chapters": 21,
+      "bible_com_id": "JDG"
+    },
+    {
+      "id": 8,
+      "slug": "ruth",
+      "name": "Ruth",
+      "chapters": 4,
+      "bible_com_id": "RUT"
+    },
+    {
+      "id": 9,
+      "slug": "1-samuel",
+      "name": "1 Samuel",
+      "chapters": 31,
+      "bible_com_id": "1SA"
+    },
+    {
+      "id": 10,
+      "slug": "2-samuel",
+      "name": "2 Samuel",
+      "chapters": 24,
+      "bible_com_id": "2SA"
+    },
+    {
+      "id": 11,
+      "slug": "1-kings",
+      "name": "1 Kings",
+      "chapters": 22,
+      "bible_com_id": "1KI"
+    },
+    {
+      "id": 12,
+      "slug": "2-kings",
+      "name": "2 Kings",
+      "chapters": 25,
+      "bible_com_id": "2KI"
+    },
+    {
+      "id": 13,
+      "slug": "1-chronicles",
+      "name": "1 Chronicles",
+      "chapters": 29,
+      "bible_com_id": "1CH"
+    },
+    {
+      "id": 14,
+      "slug": "2-chronicles",
+      "name": "2 Chronicles",
+      "chapters": 36,
+      "bible_com_id": "2CH"
+    },
+    {
+      "id": 15,
+      "slug": "ezra",
+      "name": "Ezra",
+      "chapters": 10,
+      "bible_com_id": "EZR"
+    },
+    {
+      "id": 16,
+      "slug": "nehemiah",
+      "name": "Nehemiah",
+      "chapters": 13,
+      "bible_com_id": "NEH"
+    },
+    {
+      "id": 17,
+      "slug": "esther",
+      "name": "Esther",
+      "chapters": 10,
+      "bible_com_id": "EST"
+    },
+    {
+      "id": 18,
+      "slug": "job",
+      "name": "Job",
+      "chapters": 42,
+      "bible_com_id": "JOB"
+    },
+    {
+      "id": 19,
+      "slug": "psalms",
+      "name": "Psalms",
+      "chapters": 150,
+      "bible_com_id": "PSA"
+    },
+    {
+      "id": 20,
+      "slug": "proverbs",
+      "name": "Proverbs",
+      "chapters": 31,
+      "bible_com_id": "PRO"
+    },
+    {
+      "id": 21,
+      "slug": "ecclesiastes",
+      "name": "Ecclesiastes",
+      "chapters": 12,
+      "bible_com_id": "ECC"
+    },
+    {
+      "id": 22,
+      "slug": "song-of-solomon",
+      "name": "Song of Solomon",
+      "chapters": 8,
+      "bible_com_id": "SNG"
+    },
+    {
+      "id": 23,
+      "slug": "isaiah",
+      "name": "Isaiah",
+      "chapters": 66,
+      "bible_com_id": "ISA"
+    },
+    {
+      "id": 24,
+      "slug": "jeremiah",
+      "name": "Jeremiah",
+      "chapters": 52,
+      "bible_com_id": "JER"
+    },
+    {
+      "id": 25,
+      "slug": "lamentations",
+      "name": "Lamentations",
+      "chapters": 5,
+      "bible_com_id": "LAM"
+    },
+    {
+      "id": 26,
+      "slug": "ezekiel",
+      "name": "Ezekiel",
+      "chapters": 48,
+      "bible_com_id": "EZE"
+    },
+    {
+      "id": 27,
+      "slug": "daniel",
+      "name": "Daniel",
+      "chapters": 12,
+      "bible_com_id": "DAN"
+    },
+    {
+      "id": 28,
+      "slug": "hosea",
+      "name": "Hosea",
+      "chapters": 14,
+      "bible_com_id": "HOS"
+    },
+    {
+      "id": 29,
+      "slug": "joel",
+      "name": "Joel",
+      "chapters": 3,
+      "bible_com_id": "JOL"
+    },
+    {
+      "id": 30,
+      "slug": "amos",
+      "name": "Amos",
+      "chapters": 9,
+      "bible_com_id": "AMO"
+    },
+    {
+      "id": 31,
+      "slug": "obadiah",
+      "name": "Obadiah",
+      "chapters": 1,
+      "bible_com_id": "OBA"
+    },
+    {
+      "id": 32,
+      "slug": "jonah",
+      "name": "Jonah",
+      "chapters": 4,
+      "bible_com_id": "JON"
+    },
+    {
+      "id": 33,
+      "slug": "micah",
+      "name": "Micah",
+      "chapters": 7,
+      "bible_com_id": "MIC"
+    },
+    {
+      "id": 34,
+      "slug": "nahum",
+      "name": "Nahum",
+      "chapters": 3,
+      "bible_com_id": "NAM"
+    },
+    {
+      "id": 35,
+      "slug": "habakkuk",
+      "name": "Habakkuk",
+      "chapters": 3,
+      "bible_com_id": "HAB"
+    },
+    {
+      "id": 36,
+      "slug": "zephaniah",
+      "name": "Zephaniah",
+      "chapters": 3,
+      "bible_com_id": "ZEP"
+    },
+    {
+      "id": 37,
+      "slug": "haggai",
+      "name": "Haggai",
+      "chapters": 2,
+      "bible_com_id": "HAG"
+    },
+    {
+      "id": 38,
+      "slug": "zechariah",
+      "name": "Zechariah",
+      "chapters": 14,
+      "bible_com_id": "ZEC"
+    },
+    {
+      "id": 39,
+      "slug": "malachi",
+      "name": "Malachi",
+      "chapters": 4,
+      "bible_com_id": "MAL"
+    },
+    {
+      "id": 40,
+      "slug": "matthew",
+      "name": "Matthew",
+      "chapters": 28,
+      "bible_com_id": "MAT"
+    },
+    {
+      "id": 41,
+      "slug": "mark",
+      "name": "Mark",
+      "chapters": 16,
+      "bible_com_id": "MRK"
+    },
+    {
+      "id": 42,
+      "slug": "luke",
+      "name": "Luke",
+      "chapters": 24,
+      "bible_com_id": "LUK"
+    },
+    {
+      "id": 43,
+      "slug": "john",
+      "name": "John",
+      "chapters": 21,
+      "bible_com_id": "JHN"
+    },
+    {
+      "id": 44,
+      "slug": "acts",
+      "name": "Acts",
+      "chapters": 28,
+      "bible_com_id": "ACT"
+    },
+    {
+      "id": 45,
+      "slug": "romans",
+      "name": "Romans",
+      "chapters": 16,
+      "bible_com_id": "ROM"
+    },
+    {
+      "id": 46,
+      "slug": "1-corinthians",
+      "name": "1 Corinthians",
+      "chapters": 16,
+      "bible_com_id": "1CO"
+    },
+    {
+      "id": 47,
+      "slug": "2-corinthians",
+      "name": "2 Corinthians",
+      "chapters": 13,
+      "bible_com_id": "2CO"
+    },
+    {
+      "id": 48,
+      "slug": "galatians",
+      "name": "Galatians",
+      "chapters": 6,
+      "bible_com_id": "GAL"
+    },
+    {
+      "id": 49,
+      "slug": "ephesians",
+      "name": "Ephesians",
+      "chapters": 6,
+      "bible_com_id": "EPH"
+    },
+    {
+      "id": 50,
+      "slug": "philippians",
+      "name": "Philippians",
+      "chapters": 4,
+      "bible_com_id": "PHP"
+    },
+    {
+      "id": 51,
+      "slug": "colossians",
+      "name": "Colossians",
+      "chapters": 4,
+      "bible_com_id": "COL"
+    },
+    {
+      "id": 52,
+      "slug": "1-thessalonians",
+      "name": "1 Thessalonians",
+      "chapters": 5,
+      "bible_com_id": "1TH"
+    },
+    {
+      "id": 53,
+      "slug": "2-thessalonians",
+      "name": "2 Thessalonians",
+      "chapters": 3,
+      "bible_com_id": "2TH"
+    },
+    {
+      "id": 54,
+      "slug": "1-timothy",
+      "name": "1 Timothy",
+      "chapters": 6,
+      "bible_com_id": "1TI"
+    },
+    {
+      "id": 55,
+      "slug": "2-timothy",
+      "name": "2 Timothy",
+      "chapters": 4,
+      "bible_com_id": "2TI"
+    },
+    {
+      "id": 56,
+      "slug": "titus",
+      "name": "Titus",
+      "chapters": 3,
+      "bible_com_id": "TIT"
+    },
+    {
+      "id": 57,
+      "slug": "philemon",
+      "name": "Philemon",
+      "chapters": 1,
+      "bible_com_id": "PHM"
+    },
+    {
+      "id": 58,
+      "slug": "hebrews",
+      "name": "Hebrews",
+      "chapters": 13,
+      "bible_com_id": "HEB"
+    },
+    {
+      "id": 59,
+      "slug": "james",
+      "name": "James",
+      "chapters": 5,
+      "bible_com_id": "JAS"
+    },
+    {
+      "id": 60,
+      "slug": "1-peter",
+      "name": "1 Peter",
+      "chapters": 5,
+      "bible_com_id": "1PE"
+    },
+    {
+      "id": 61,
+      "slug": "2-peter",
+      "name": "2 Peter",
+      "chapters": 3,
+      "bible_com_id": "2PE"
+    },
+    {
+      "id": 62,
+      "slug": "1-john",
+      "name": "1 John",
+      "chapters": 5,
+      "bible_com_id": "1JN"
+    },
+    {
+      "id": 63,
+      "slug": "2-john",
+      "name": "2 John",
+      "chapters": 1,
+      "bible_com_id": "2JN"
+    },
+    {
+      "id": 64,
+      "slug": "3-john",
+      "name": "3 John",
+      "chapters": 1,
+      "bible_com_id": "3JN"
+    },
+    {
+      "id": 65,
+      "slug": "jude",
+      "name": "Jude",
+      "chapters": 1,
+      "bible_com_id": "JUD"
+    },
+    {
+      "id": 66,
+      "slug": "revelation",
+      "name": "Revelation",
+      "chapters": 22,
+      "bible_com_id": "REV"
+    }
+  ]
+}
