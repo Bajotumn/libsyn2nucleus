@@ -142,7 +142,7 @@ class nucleus {
   }
 }
     */
-  async getCSRFToken(url){
+  async getCSRFToken(url) {
     return new Promise(resolve => {
       this.request2.get(url, function(err, res, body) {
         if (res.statusCode === 200) {
@@ -155,8 +155,10 @@ class nucleus {
     });
   }
   async editItem(itemID, sourceObj, imageID) {
-    let csrfToken = await this.getCSRFToken(NUCLEUSROOT + ENDPOINTS.edit+'/' + itemID + '?status=new');
-    return new Promise((resolve,reject) => {
+    let csrfToken = await this.getCSRFToken(
+      NUCLEUSROOT + ENDPOINTS.edit + "/" + itemID + "?status=new"
+    );
+    return new Promise((resolve, reject) => {
       this.request2.post(
         NUCLEUSROOT + ENDPOINTS.edit,
         {
@@ -236,10 +238,10 @@ class nucleus {
           }
         },
         function(err, res, body) {
-          if(res.statusCode ===200){
+          if (res.statusCode === 200) {
             resolve(body);
-          }else{
-            reject(res.statusCode + '|' + res.statusMessage);
+          } else {
+            reject(res.statusCode + "|" + res.statusMessage);
           }
         }
       );
@@ -248,7 +250,9 @@ class nucleus {
   uploadAudioFile(fileSource) {
     return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio, {
       applyToken: true
-    }).then(body => {return JSON.parse(body);});
+    }).then(body => {
+      return JSON.parse(body);
+    });
   }
   async uploadImage(imageSource) {
     let newImageSource = await this.getRedirectUrl(imageSource);
@@ -307,12 +311,10 @@ class nucleus {
     });
 
     console.dir(
-      `Processing formData...${sourceURL}`,
-      `formName: ${formName}`,
-      `endPoint: ${endpoint}`,
+      `Processing formData...${sourceURL} formName: ${formName} endPoint: ${endpoint}`,
       params
     );
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
       formData.submit(
         {
           protocol: "https:",
