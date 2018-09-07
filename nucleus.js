@@ -256,9 +256,7 @@ class nucleus {
   }
   async uploadImage(imageSource) {
     let newImageSource = await this.getRedirectUrl(imageSource);
-    return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image, {
-      applyToken: false
-    });
+    return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image);
   }
   getRedirectUrl(url) {
     return new Promise(resolve => {
