@@ -25,19 +25,20 @@ const cheerio = require("cheerio"),
     "Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***"
   );
   let username, password;
-  // Try/Catch to workaround reading from tty in debug
-  try {
-    username = readline.questionEMail("Email: ");
-    password = readline.question(`Password for "${username}": `, {
-      hideEchoBack: true
-    });
-  } catch (error) {
-    if (fs.existsSync(__dirname + "/auth.cfg")) {
-      let auth = fs.readFileSync(__dirname + "/auth.cfg").toString();
-      console.log('Loaded dev username/password from ./auth.cfg');
-      auth = auth.split("\n");
-      username = auth[0];
-      password = auth[1];
+  if (fs.existsSync(__dirname + "/auth.cfg")) {
+    let auth = fs.readFileSync(__dirname + "/auth.cfg").toString();
+    console.log("Loaded dev username/password from ./auth.cfg");
+    auth = auth.split("\n");
+    username = auth[0];
+    password = auth[1];
+  } else {
+    try {
+      username = readline.questionEMail("Email: ");
+      password = readline.question(`Password for "${username}": `, {
+        hideEchoBack: true
+      });
+    } catch (error) {
+      console.error(error);
     }
   }
   let nucleusApi = new nucleus(username, password);

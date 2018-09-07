@@ -229,7 +229,7 @@ class nucleus {
   uploadAudioFile(fileSource) {
     return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio, {
       applyToken: true
-    }).then(body => {resolve(JSON.parse(body));});
+    }).then(body => {return JSON.parse(body);});
   }
   async uploadImage(imageSource) {
     let newImageSource = await this.getRedirectUrl(imageSource);
@@ -293,7 +293,7 @@ class nucleus {
       `endPoint: ${endpoint}`,
       params
     );
-    return new Promise(resolve => {
+    return new Promise((resolve,reject) => {
       formData.submit(
         {
           protocol: "https:",
