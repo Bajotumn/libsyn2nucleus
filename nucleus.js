@@ -5,7 +5,8 @@ const cheerio = require("cheerio"),
   Agent = require("agentkeepalive").HttpsAgent,
   FormData = require("form-data"),
   streamlength = require("stream-length"),
-  jsonBody = require("body/json");
+  getBody = require("body");
+jsonBody = require("body/json");
 
 const NUCLEUSROOT = "https://nucleus.church";
 const ENDPOINTS = {
@@ -96,6 +97,8 @@ class nucleus {
       agent: this.agent,
       resolveWithFullResponse: true
     });
+    this.request.debug = true;
+    this.request2.debug = true;
     this.email = email;
     this.password = password;
   }
@@ -140,49 +143,93 @@ class nucleus {
 }
     */
   editItem(itemID, sourceObj, imageID) {
-    return this.request(NUCLEUSROOT + ENDPOINTS.edit, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json;charset=UTF-8",
-        Connection: "Keep-Alive",
-        origin: NUCLEUSROOT,
-        referer: NUCLEUSROOT + "/admin/media/edit",
-        "cache-control": "no-cache",
-        accept: "application/json"
-      },
-      json: true,
-      body: {
-        mediaItem: {
-          id: itemID, //"1916"
-          sermon_engine_id: 244,
-          title: sourceObj.item_title, //"God's Glory Alone | John 17:1-5, 20-26"
-          description: sourceObj.item_body_clean, //"God's Glory Alone | John 17:1-5, 20-26 "
-          published_at: "2017-10-29 21:07:34",
-          artwork: imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
-          scriptures: [
-            {
-              bible_version_id: 13,
-              bible_book_id: 43,
-              chapter: "17",
-              verses: "1-5"
-            },
-            {
-              bible_version_id: 13,
-              bible_book_id: 43,
-              chapter: "17",
-              verses: "20-26"
+    return new Promise(resolve => {
+      this.request2.post(
+        NUCLEUSROOT + ENDPOINTS.edit,
+        {
+          headers: {
+            "Content-type": "application/json;charset=UTF-8",
+            Connection: "Keep-Alive",
+            origin: NUCLEUSROOT,
+            referer: NUCLEUSROOT + "/admin/media/edit",
+            "cache-control": "no-cache",
+            accept: "application/json"
+          },
+          json: true,
+          body: {
+            /*
+            mediaItem: {
+              id: itemID, //"1916"
+              sermon_engine_id: 244,
+              title: sourceObj.item_title, //"God's Glory Alone | John 17:1-5, 20-26"
+              description: sourceObj.item_body_clean, //"God's Glory Alone | John 17:1-5, 20-26 "
+              published_at: "2017-10-29 21:07:34",
+              artwork: imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
+              scriptures: [
+                {
+                  bible_version_id: 13,
+                  bible_book_id: 43,
+                  chapter: "17",
+                  verses: "1-5"
+                },
+                {
+                  bible_version_id: 13,
+                  bible_book_id: 43,
+                  chapter: "17",
+                  verses: "20-26"
+                }
+              ],
+              speakers: ["Adam Viramontes"],
+              added_to_podcast: false,
+              files: [],
+              tags: []
             }
-          ],
-          speakers: ["Adam Viramontes"],
-          added_to_podcast: false
+            */
+            id: 1916,
+            sermon_engine_id: 244,
+            title: "God's Glory Alone | John 17:1-5, 20-26",
+            description: null,
+            published_at: "2017-10-29 21:07:34",
+            source: "uploads/340c3ea10ad1368adb3ec18969afac0322d25881.mp3",
+            artwork: "uploads/1b56789e44c9c08949f195f9727f7b1cec9825dd.jpg",
+            deleted_at: null,
+            created_at: "2018-09-06 20:38:39",
+            updated_at: "2018-09-06 20:38:39",
+            filename: "102917Mosaic.mp3",
+            file_size: 34601857,
+            slug: null,
+            source_type: "hosted-audio",
+            scriptures: [
+              {
+                bible_version_id: 13,
+                bible_book_id: 43,
+                chapter: "17",
+                verses: "1-5"
+              },
+              {
+                bible_version_id: 13,
+                bible_book_id: 43,
+                chapter: "17",
+                verses: "20-26"
+              }
+            ],
+            files: [],
+            tags: [],
+            speakers: ["Adam Viramontes"],
+            podcasts: [],
+            added_to_podcast: false
+          }
+        },
+        function(err, res, body) {
+          resolve(res);
         }
-      }
+      );
     });
   }
   uploadAudioFile(fileSource) {
     return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio, {
       applyToken: true
-    });
+    }).then(body => {resolve(JSON.parse(body));});
   }
   async uploadImage(imageSource) {
     let newImageSource = await this.getRedirectUrl(imageSource);
@@ -258,7 +305,7 @@ class nucleus {
           if (err) {
             reject(err);
           }
-          jsonBody(response, (err, body) => {
+          getBody(response, (err, body) => {
             if (err) {
               reject(err);
             }
