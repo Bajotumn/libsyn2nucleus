@@ -275,7 +275,7 @@ class nucleus {
    */
   async _postFormData(sourceURL, formName, endpoint, params) {
     let csrfToken = await this.getCSRFToken(
-      NUCLEUSROOT + endpoint
+      NUCLEUSROOT + '/admin/media'
     );
     let formData = new FormData();
     let srcStream = require("request")(sourceURL, {
