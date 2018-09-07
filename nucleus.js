@@ -237,9 +237,9 @@ class nucleus {
         },
         function(err, res, body) {
           if(res.statusCode ===200){
-          resolve(body);
+            resolve(body);
           }else{
-            reject(body);
+            reject(res.statusCode + '|' + res.statusMessage);
           }
         }
       );

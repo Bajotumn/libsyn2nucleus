@@ -69,6 +69,8 @@ const cheerio = require("cheerio"),
         console.log(`imageID: ${imageID}`);
         nucleusApi.editItem(itemID, testSource, imageID).then(response => {
           console.dir("Response from media edit", response);
+        }).catch(err => {
+          console.error(err);
         });
       });
     });
