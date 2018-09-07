@@ -274,6 +274,9 @@ class nucleus {
    * @param {object} params applyToken: add token to form, fileName: override filename, contentType: override Content-Type form header
    */
   async _postFormData(sourceURL, formName, endpoint, params) {
+    let csrfToken = await this.getCSRFToken(
+      NUCLEUSROOT + endpoint
+    );
     let formData = new FormData();
     let srcStream = require("request")(sourceURL, {
       followRedirect: true,
@@ -304,7 +307,8 @@ class nucleus {
 
     let cookie = this.cookiejar.getCookieString(NUCLEUSROOT);
     let headers = Object.assign({
-      "x-csrf-token": this.csrf_token, //I assume this should always be included...
+      "x-xsrf-token": this.csrf_token, //I assume this should always be included...
+      "x-csrf-token": csrfToken,
       cookie: cookie
     });
 
