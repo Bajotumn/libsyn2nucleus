@@ -142,18 +142,33 @@ class nucleus {
   }
 }
     */
-  editItem(itemID, sourceObj, imageID) {
+  async getCSRFToken(url){
     return new Promise(resolve => {
+      this.request2.get(url, function(err, res, body) {
+        if (res.statusCode === 200) {
+          if (body.length > 4) {
+            let $ = cheerio.load(body);
+            resolve($('meta[name="csrf-token"]').attr("content"));
+          }
+        }
+      });
+    });
+  }
+  async editItem(itemID, sourceObj, imageID) {
+    let csrfToken = await this.getCSRFToken(NUCLEUSROOT + ENDPOINTS.edit+'/' + itemID + '?status=new');
+    return new Promise((resolve,reject) => {
       this.request2.post(
         NUCLEUSROOT + ENDPOINTS.edit,
         {
+          method: "POST",
           headers: {
             "Content-type": "application/json;charset=UTF-8",
             Connection: "Keep-Alive",
             origin: NUCLEUSROOT,
             referer: NUCLEUSROOT + "/admin/media/edit",
             "cache-control": "no-cache",
-            accept: "application/json"
+            accept: "application/json",
+            "x-csrf-token": csrfToken
           },
           json: true,
           body: {
@@ -187,7 +202,7 @@ class nucleus {
             */
             id: 1916,
             sermon_engine_id: 244,
-            title: "God's Glory Alone | John 17:1-5, 20-26",
+            title: "God's Glory Alone | John 17:1-5, 20-26 .",
             description: null,
             published_at: "2017-10-29 21:07:34",
             source: "uploads/340c3ea10ad1368adb3ec18969afac0322d25881.mp3",
@@ -221,7 +236,11 @@ class nucleus {
           }
         },
         function(err, res, body) {
-          resolve(res);
+          if(res.statusCode ===200){
+          resolve(body);
+          }else{
+            reject(body);
+          }
         }
       );
     });

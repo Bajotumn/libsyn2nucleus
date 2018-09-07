@@ -53,21 +53,28 @@ const cheerio = require("cheerio"),
       image_url: "https://assets.libsyn.com/secure/content/17514154",
       url: "http://traffic.libsyn.com/preview/mosaicabq/102917Mosaic.mp3"
     };
-
-    nucleusApi.uploadAudioFile(testSource.url).then(body => {
+    /*
+    nucleusApi.editItem("1587", "", "").then(response => {
+      console.dir("Response from media edit", response);
+    });
+    */
+    
+    nucleusApi.uploadAudioFile(testSource.url).then(abody => {
       console.log("Upload got response: ");
-      console.dir(body);
-      let itemID = body.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
+      console.dir(abody);
+      let itemID = abody.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
       let imageID = "";
-      nucleusApi.uploadImage(testSource.image_url).then(body => {
-        imageID = body.path;
+      nucleusApi.uploadImage(testSource.image_url).then(ibody => {
+        imageID = ibody.path;
         console.log(`imageID: ${imageID}`);
         nucleusApi.editItem(itemID, testSource, imageID).then(response => {
           console.dir("Response from media edit", response);
         });
       });
     });
+    
   });
+
   /*
     let subdomain = readline.question(
       'Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": '
