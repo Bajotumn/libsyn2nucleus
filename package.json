@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "agentkeepalive": "^3.5.1",
+    "bible-references": "^3.0.1",
     "body": "^5.1.0",
+    "chapter-and-verse": "^3.0.2",
     "cheerio": "^1.0.0-rc.2",
     "form-data": "^2.3.2",
     "jsonfile": "^4.0.0",

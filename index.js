@@ -13,14 +13,71 @@
  **                    url: "http://traffic.libsyn.com/mosaicabq/New_World___Revelation_21_1-82-19-2017.mp3?dest-id=549729",
  **    }
  */
+
+//[].concat.apply([], [array1, array2, ...])
 const cheerio = require("cheerio"),
   request = require("sync-request"),
-  jsonfile = require("jsonfile"),
   fs = require("fs"),
   readline = require("readline-sync"),
-  nucleus = require("./nucleus.js");
+  nucleus = require("./nucleus.js"),
+  bible = require("chapter-and-verse");
+
+var dbSource = null;
 
 (async () => {
+  let availablePlugins = loadSourcePlugins();
+  let pluginSelection = 0; //readline.keyInSelect(availablePlugins.map(p=>{return p.name}), "Which source plugin? ");
+  if (pluginSelection !== undefined) {
+    console.log(`Source set to ${availablePlugins[pluginSelection]}`);
+    dbSource = new (require(availablePlugins[pluginSelection].path))();
+  }
+  if (dbSource.beginConnect()) {
+    let database = dbSource.getDatabase();
+    if (database) {
+      let artworklessCount = 0;
+      for(series in database){
+        if (!database[series].artwork) {
+          artworklessCount++;
+        }
+      }
+      if (artworklessCount) {
+        let addArtwork = true;
+        try{
+          addArtwork = readline.keyInYN(`There are ${artworklessCount} series without artwork. Add some now? `)
+        }catch(e){}
+        if (addArtwork) {
+          for(series in database){
+            if (!database[series].artwork) {
+              let catUrl = "";
+              let urlWorks = true;
+              do {
+                let skipped = false;
+                skipped = (catUrl = readline.question(`Enter url (or blank) for "${series}": `, {
+                    limit: [
+                      /(?!mailto:)(?:(?:http|https|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))|localhost)(?::\d{2,5})?(?:(\/|\?|#)[^\s]*)?/i,
+                      "",
+                      null
+                    ],
+                    limitMessage: "That's not a valid url"
+                  })) == "";
+                if (skipped) {
+                  console.log("Okay, no artwork for " + series);
+                  continue;
+                }
+                urlWorks = urlOk(catUrl);
+                if (!urlWorks && !skipped) {
+                  console.log("That url didn't seem to work, please try again.");
+                }
+              } while (!urlWorks && !skipped);
+              database[series].artwork = catUrl;
+            }
+          }
+        }
+      } //endif(artworklessCount)
+      dbSource.saveDB(database);
+    } //endif(database)
+  } //endif(beginConnect())
+  /*
   console.log("Let's log you into Nucleus. ***(YOUR INFORMATION IS NEVER SAVED TO DISK)***");
   let username, password;
   if (fs.existsSync(__dirname + "/auth.cfg")) {
@@ -66,7 +123,7 @@ const cheerio = require("cheerio"),
         console.error(err);
       });
       */
-    /*
+  /*
                  nucleusApi
                    .uploadAudioFile(testSource.url)
                    .then(abody => {
@@ -97,70 +154,104 @@ const cheerio = require("cheerio"),
                });
 */
 
-    let subdomain = readline.question('Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
-    console.log(`Got it! Let's migrate your sermons from ${subdomain}.libsyn.com to Nucleus`);
-    let database = {};
-    let databaseFile = `${__dirname}/database/${subdomain}.json`;
-    let useCache = true;
-    if (fs.existsSync(databaseFile)) {
+  /*
+  let subdomain = "mosaicabq"; //readline.question('Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
+  console.log(`Got it! Let's migrate your sermons from ${subdomain}.libsyn.com to Nucleus`);
+  let database = {};
+  let databaseFile = `${__dirname}/database/${subdomain}.json`;
+  let useCache = true;
+  let databaseFound = false;
+  try {
+    databaseFound = fs.existsSync(databaseFile);
+  } catch (e) {}
+  if (databaseFound) {
+    try {
       useCache = readline.keyInYN("Cached database found on disk. Use it? ");
-    }
-    if (useCache === false) {
-      let addSeriesImages = false;
-      let libsynURL = `https://${subdomain}.libsyn.com/`;
-      let categories = getCategories_sync(libsynURL);
+    } catch (e) {}
+  }
+  if (useCache === false) {
+    let libsynURL = `https://${subdomain}.libsyn.com/`;
+    let categories = getCategories_sync(libsynURL);
 
-      console.log(`Found ${categories.length} categories`);
+    console.log(`Found ${categories.length} categories`);
 
-      if (categories.length > 0) {
-        if (readline.keyInYN(`Would you like to define artwork for these ${categories.length} categories? `)) {
-          categories.forEach(category => {
-            let catUrl = '';
-            let urlWorks = true;
-            do{
-              catUrl = readline.question(`Enter url for "${category}": `);
-              urlWorks = urlOk(catUrl);
-              if(!urlWorks){
-                console.log("That url didn't seem to work, please try again.");
-              }
-            }while(!urlWorks);
-            database[category] = { artwork: catUrl };
-          });
-        }
-        console.time("Retrieve database from libsyn");
+    if (categories.length > 0) {
+      if (readline.keyInYN(`Would you like to define artwork for these ${categories.length} categories? `)) {
         categories.forEach(category => {
-          database[category] = database[category] || { items: getCategoryItems_sync(libsynURL, category) };
+          let catUrl = "";
+          let urlWorks = true;
+          do {
+            let skipped = false;
+            skipped =
+              (catUrl = readline.question(`Enter url for "${category}": `, {
+                limit: [
+                  /(?!mailto:)(?:(?:http|https|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))|localhost)(?::\d{2,5})?(?:(\/|\?|#)[^\s]*)?/i,
+                  "",
+                  null
+                ],
+                limitMessage: "That's not a valid url"
+              })) == "";
+            if (skipped) {
+              console.log("Okay, no artwork for " + category);
+              continue;
+            }
+            urlWorks = urlOk(catUrl);
+            if (!urlWorks && !skipped) {
+              console.log("That url didn't seem to work, please try again.");
+            }
+          } while (!urlWorks && !skipped);
+          database[category] = { artwork: catUrl };
         });
-      } else {
-        //console.time("Retrieve database from libsyn");
-        database = { items: getCategoryItems_sync(libsynURL, "") };
       }
-
-      console.timeEnd("Retrieve database from libsyn");
-      jsonfile.writeFileSync(databaseFile, database);
+      console.time("Retrieve database from libsyn");
+      categories.forEach(category => {
+        database[category] = database[category] || {};
+        database[category].items = getCategoryItems_sync(libsynURL, category);
+      });
     } else {
-      database = jsonfile.readFileSync(databaseFile);
+      console.time("Retrieve database from libsyn");
+      database = { items: getCategoryItems_sync(libsynURL, "") };
     }
-  });
+
+    console.timeEnd("Retrieve database from libsyn");
+    jsonfile.writeFileSync(databaseFile, database);
+  } else {
+    database = jsonfile.readFileSync(databaseFile);
+    for (var series in database) {
+      for (var item in database[series].items) {
+        console.log(database[series].items[item].item_title);
+      }
+    }
+  }*/
+  //});
 })();
-function urlOk(url){
-  let res = request(url);
-  return (res.statusCode === 200 || res.statusCode === 302 || res.statusCode === 301);
+function loadSourcePlugins() {
+  let src = fs.readdirSync(__dirname + "/plugins");
+  let plugins = src.map(p => {
+    return {
+      name: p.substr(0, p.length - 3),
+      path: __dirname + "/plugins/" + p
+    };
+  });
+  return plugins;
+}
+function urlOk(url) {
+  let res = request("GET", url);
+  return res.statusCode === 200 || res.statusCode === 302 || res.statusCode === 301;
 }
 function getCategoryItems_sync(url, category) {
   let res,
     i = 1,
     body;
   let fulljson = JSON.parse("[ ]");
-  //console.log("Getting ", category, " items...");
   do {
-    res = request("GET", url + "page/" + i + category + "/render-type/json");
-
+    res = request("GET", url + "page/" + i + "/website/category/" + category + "/render-type/json");
     if (!res.error && res.statusCode === 200) {
       body = res.getBody();
       if (body.length > 4) {
         let j = JSON.parse(body);
         j.forEach(stripAttributes);
+        console.dir(j);
         fulljson.push(...j);
         i++;
       }
@@ -201,6 +292,7 @@ function stripAttributes(j) {
   delete j.premium_state;
   delete j.item_slug;
   delete j.comment_count;
+  delete j.item_body;
   delete j.item_body_short;
   delete j.full_item_url;
   delete j.image_content_id;
@@ -213,7 +305,7 @@ function stripAttributes(j) {
 function getCategories_sync(url) {
   console.time("Retrieve categories from libsyn");
   let categories = new Array();
-  let categoriesRegEx = /<a href="([^"]+)/g;
+  let categoriesRegEx = /<a href="\/website\/category\/([^"]+)/g;
   let res = request("GET", url + "website");
   if (!res.error && res.statusCode === 200) {
     let $ = cheerio.load(res.getBody());

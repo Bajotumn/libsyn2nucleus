@@ -5,8 +5,8 @@ const cheerio = require("cheerio"),
   Agent = require("agentkeepalive").HttpsAgent,
   FormData = require("form-data"),
   streamlength = require("stream-length"),
-  getBody = require("body");
-jsonBody = require("body/json");
+  getBody = require("body"),
+  jsonBody = require("body/json");
 
 const NUCLEUSROOT = "https://nucleus.church";
 const ENDPOINTS = {
@@ -161,9 +161,7 @@ class nucleus {
       NUCLEUSROOT + ENDPOINTS.edit + "/" + itemID + "?status=new"
     );
     */
-    let pubDate = new Date(sourceObj.release_date)
-      .toISOString()
-      .match(/([\d]{4}-[\d]{2}-[\d]{2})/)[0] + " 12:00:00";
+    let pubDate = new Date(sourceObj.release_date).toISOString().match(/([\d]{4}-[\d]{2}-[\d]{2})/)[0] + " 12:00:00";
     return new Promise((resolve, reject) => {
       this.request2.post(
         NUCLEUSROOT + ENDPOINTS.edit,
@@ -219,21 +217,13 @@ class nucleus {
     });
   }
   uploadAudioFile(fileSource) {
-    return this._postFormData(
-      fileSource,
-      "audiofile",
-      ENDPOINTS.upload.audio
-    ).then(body => {
+    return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio).then(body => {
       return JSON.parse(body);
     });
   }
   async uploadImage(imageSource) {
     let newImageSource = await this.getRedirectUrl(imageSource);
-    return this._postFormData(
-      newImageSource,
-      "image",
-      ENDPOINTS.upload.image
-    ).then(body => {
+    return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image).then(body => {
       return JSON.parse(body);
     });
   }
@@ -263,8 +253,7 @@ class nucleus {
 
     params = params || {};
     let applyToken = params.applyToken || false,
-      fileName =
-        params.fileName || sourceURL.substr(sourceURL.lastIndexOf("/") + 1),
+      fileName = params.fileName || sourceURL.substr(sourceURL.lastIndexOf("/") + 1),
       contentType = params.contentType || srcStream.getHeader("content-type");
 
     await streamlength(srcStream).then(len => {
@@ -288,10 +277,7 @@ class nucleus {
       cookie: cookie
     });
 
-    console.dir(
-      `Processing formData...${sourceURL} formName: ${formName} endPoint: ${endpoint}`,
-      params
-    );
+    console.dir(`Processing formData...${sourceURL} formName: ${formName} endPoint: ${endpoint}`, params);
     return new Promise((resolve, reject) => {
       formData.submit(
         {
@@ -317,9 +303,7 @@ class nucleus {
   login() {
     return this._getAuthenticationOptions().then(authOpts => {
       this.csrf_token = authOpts.token;
-      let form = `_token=${authOpts.token}&email=${this.email}&password=${
-        this.password
-      }`;
+      let form = `_token=${authOpts.token}&email=${this.email}&password=${this.password}`;
       return this.request(authOpts.url, {
         method: "POST",
         followAllRedirects: true,
