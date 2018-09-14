@@ -402,12 +402,10 @@ class nucleus {
   }
   async getSermonEngineId() {
     const regex = /sermon_engine_id&quot;:([\d]+),/gm;
-    let id = await new Promise(resolve => {
-      this.request2(NUCLEUSROOT + "/admin/media", (err, resp, body) => {
-        let matches = regex.exec(body);
-        resolve(matches[1]);
+    let id = await this.request(NUCLEUSROOT + "/admin/media").then(resp=> {
+        let matches = regex.exec(resp.body);
+        return Promise.resolve(matches[1]);
       });
-    });
     return id;
   }
   _getAuthenticationOptions() {
