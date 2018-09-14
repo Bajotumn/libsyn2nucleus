@@ -91,6 +91,7 @@ var dbSource = null;
               let result = await nucleusApi.uploadAudioFile(database[series].items[item]).then(abody => {
                 let itemID = abody.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
                 database[series].items[item].nucleusID = itemID; //We'll check this in future runs to make sure we don't reupload audio
+                dbSource.saveDB(database);
                 let imageID = "";
                 return nucleusApi.uploadImage(database[series].items[item]).then(ibody => {
                   imageID = ibody.path;
@@ -103,6 +104,7 @@ var dbSource = null;
                       database[series].items[other].imageID = imageID; //We'll check this in future runs to make sure we don't reupload image
                     }
                   }
+                  dbSource.saveDB(database);
                   return nucleusApi
                     .editItem(itemID, database[series].items[item], imageID)
                     .then(response => {
