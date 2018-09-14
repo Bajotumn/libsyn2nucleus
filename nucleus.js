@@ -157,11 +157,7 @@ class nucleus {
     });
   }
   async editItem(itemID, sourceObj, imageID) {
-    /*let csrfToken = await this.getCSRFToken(
-      NUCLEUSROOT + ENDPOINTS.edit + "/" + itemID + "?status=new"
-    );
-    */
-    let pubDate = new Date(sourceObj.release_date).toISOString().match(/([\d]{4}-[\d]{2}-[\d]{2})/)[0] + " 12:00:00";
+    //let pubDate = new Date(sourceObj.release_date).toISOString().match(/([\d]{4}-[\d]{2}-[\d]{2})/)[0] + " 12:00:00";
     return new Promise((resolve, reject) => {
       this.request2.post(
         NUCLEUSROOT + ENDPOINTS.edit,
@@ -179,12 +175,12 @@ class nucleus {
           json: true,
           body: {
             mediaItem: {
-              id: itemID, //"1916"
+              id: sourceObj.nucleusID, //"1916"
               sermon_engine_id: 244,
-              title: sourceObj.item_title, //"God's Glory Alone | John 17:1-5, 20-26"
-              description: sourceObj.item_body_clean, //"God's Glory Alone | John 17:1-5, 20-26 "
-              published_at: pubDate, //"2017-10-29 01:00:00",
-              artwork: imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
+              title: sourceObj.title, //"God's Glory Alone | John 17:1-5, 20-26"
+              description: sourceObj.description, //"God's Glory Alone | John 17:1-5, 20-26 "
+              published_at: sourceObj.date, //"2017-10-29 01:00:00",
+              artwork: sourceObj.imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
               scriptures: [
                 {
                   bible_version_id: 13,
@@ -216,7 +212,7 @@ class nucleus {
       );
     });
   }
-  uploadAudioFile(fileSource) {
+  async uploadAudioFile(fileSource) {
     return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio).then(body => {
       return JSON.parse(body);
     });
@@ -227,10 +223,72 @@ class nucleus {
       return JSON.parse(body);
     });
   }
+  addPlaylist(name, artwork, description) {
+    return this.uploadImage(artwork).then(img => {
+      return this.request.post(NUCLEUSROOT + ENDPOINTS.playlist.new, {
+        method: "POST",
+        followAllRedirects: true,
+        headers: {
+          "Content-type": "application/json;charset=UTF-8",
+          Connection: "Keep-Alive",
+          origin: NUCLEUSROOT,
+          referer: NUCLEUSROOT + ENDPOINTS.playlist.new,
+          accept: "*/*",
+          "x-csrf-token": this.csrf_token
+        },
+        json: true,
+        body: {
+          playlist: {
+            title: name,
+            description: description,
+            artwork: img.path
+          }
+        }
+      });
+    });
+  }
+  addItemsToPlaylist(playlistID, episodeIDs) {
+    //{"mediaItems":[{"id":1587}]}
+    let idObj = episodeIDs.map(id => {
+      return { id: id };
+    });
+    let endpoint = NUCLEUSROOT + ENDPOINTS.playlist.items.replace(":id", playlistID);
+    return new Promise((resolve, reject) => {
+      this.request2.post(
+        endpoint,
+        {
+          method: "POST",
+          followAllRedirects: true,
+          headers: {
+            "Content-type": "application/json",
+            Connection: "Keep-Alive",
+            origin: NUCLEUSROOT,
+            referer: endpoint,
+            "cache-control": "no-cache",
+            accept: "*/*",
+            "x-csrf-token": this.csrf_token
+          },
+          json: true,
+          body: {
+            mediaItems: idObj
+          }
+        },
+        (err, response, body) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(body);
+          }
+        }
+      );
+    });
+  }
   getRedirectUrl(url) {
     return new Promise(resolve => {
       req2.get(url, function(err, res, body) {
-        console.log(`${url} => ${res.request.uri.href}`);
+        if (url !== res.request.uri.href) {
+          console.log(`${url} => ${res.request.uri.href}`);
+        }
         resolve(res.request.uri.href);
       });
     });
@@ -256,31 +314,38 @@ class nucleus {
       fileName = params.fileName || sourceURL.substr(sourceURL.lastIndexOf("/") + 1),
       contentType = params.contentType || srcStream.getHeader("content-type");
 
-    await streamlength(srcStream).then(len => {
-      srcLength = len;
-    });
+    try {
+      await streamlength(srcStream).then(len => {
+        srcLength = len;
+      });
+    } catch (e) {
+      console.error(e);
+    }
     if (applyToken) {
       formData.append("_token", this.csrf_token, {
         knownLength: this.csrf_token.length
       });
     }
 
-    formData.append(formName, srcStream, {
-      knownLength: srcLength,
-      filename: fileName,
-      contentType: contentType
-    });
+    let frmOpts = { filename: fileName, contentType: contentType };
+    if (srcLength) {
+      frmOpts.knownLength = srcLength;
+    }
+    formData.append(formName, srcStream, frmOpts);
 
     let cookie = this.cookiejar.getCookieString(NUCLEUSROOT);
     let headers = Object.assign({
+      referer: NUCLEUSROOT + endpoint,
       "x-csrf-token": this.csrf_token,
       cookie: cookie
     });
 
-    console.dir(`Processing formData...${sourceURL} formName: ${formName} endPoint: ${endpoint}`, params);
+    console.dir(`Processing formData...${sourceURL} formName: ${formName} endPoint: ${endpoint}`);
     return new Promise((resolve, reject) => {
       formData.submit(
         {
+          agent: this.agent,
+
           protocol: "https:",
           host: "nucleus.church",
           path: endpoint,
@@ -289,13 +354,14 @@ class nucleus {
         (err, response) => {
           if (err) {
             reject(err);
+          } else {
+            getBody(response, (err, body) => {
+              if (err) {
+                reject(err);
+              }
+              resolve(body);
+            });
           }
-          getBody(response, (err, body) => {
-            if (err) {
-              reject(err);
-            }
-            resolve(body);
-          });
         }
       );
     });

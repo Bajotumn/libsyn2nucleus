@@ -67,7 +67,7 @@ class libsyn {
   getDatabase() {
     let database = {};
 
-    let useCache = false;
+    let useCache = true;
     let databaseFound = false;
     try {
       databaseFound = fs.existsSync(this.databaseFile);
@@ -88,8 +88,11 @@ class libsyn {
       if (categories.length > 0) {
         console.time("Retrieve database from libsyn");
         categories.forEach(category => {
-          database[category] = {};
-          database[category].items = getCategoryItems_sync(libsynURL, category);
+          database[category] = {
+            artwork: null,
+            description: null,
+            items: getCategoryItems_sync(libsynURL, category)
+          };
         });
       } else {
         console.time("Retrieve database from libsyn");
@@ -98,11 +101,6 @@ class libsyn {
       console.timeEnd("Retrieve database from libsyn");
     } else {
       database = jsonfile.readFileSync(this.databaseFile);
-      for (var series in database) {
-        for (var item in database[series].items) {
-          console.log(database[series].items[item].item_title);
-        }
-      }
     }
     this.saveDB(database);
     return database;
@@ -166,7 +164,7 @@ function normalizeOutput(input) {
     description: input.item_body_clean,
     artwork: input.image_url,
     date: pubDate,
-    url: input.url
+    url: input.primary_content.url_secure
   };
 }
 
