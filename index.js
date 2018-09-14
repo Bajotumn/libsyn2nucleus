@@ -113,6 +113,7 @@ var dbSource = null;
             } else {
               uploadIDs.push(database[series].items[item].nucleusID);
             }
+            dbSource.saveDB(database);
           } //); //end items foreach
           if (!database[series].playlistId && !database[series].itemsAdded)
             nucleusApi.addPlaylist(series, database[series].artwork, database[series].description).then(response => {
