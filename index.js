@@ -95,6 +95,14 @@ var dbSource = null;
                 return nucleusApi.uploadImage(database[series].items[item]).then(ibody => {
                   imageID = ibody.path;
                   database[series].items[item].imageID = imageID; //We'll check this in future runs to make sure we don't reupload image
+                  /**
+                   * This is gonna be messy...
+                   */
+                  for (other in database[series].items) {
+                    if (database[series].items[other].artwork === database[series].items[item].artwork && !database[series].items[other].imageID) {
+                      database[series].items[other].imageID = imageID; //We'll check this in future runs to make sure we don't reupload image
+                    }
+                  }
                   return nucleusApi
                     .editItem(itemID, database[series].items[item], imageID)
                     .then(response => {
