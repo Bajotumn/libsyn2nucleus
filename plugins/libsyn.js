@@ -55,7 +55,7 @@ const cheerio = require("cheerio"),
 class libsyn {
   /* Interface implementation */
   beginConnect() {
-    this.subdomain = "mosaicabq"; //readline.question('Please enter the Libsyn *this.subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
+    this.subdomain = readline.question('Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
 
     if (checkSubdomainExistance(this.subdomain)) {
       console.log(`Got it! Let's migrate your sermons from ${this.subdomain}.libsyn.com to Nucleus`);

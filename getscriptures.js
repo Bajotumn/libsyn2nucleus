@@ -89,7 +89,22 @@ function getScriptures(sources, bibleVersion = 13) {
       });
     }
   });
-  return ret;
+  return removeDuplicates(ret);
+}
+function removeDuplicates(arr) {
+  let cleaned = [];
+  arr.forEach(function(itm) {
+    let unique = true;
+    cleaned.forEach(function(itm2) {
+      if (isEqual(itm, itm2)) unique = false;
+    });
+    if (unique) cleaned.push(itm);
+  });
+  return cleaned;
+}
+function isEqual(a, b) {
+  //Who would have thought! This is actually quite performant!!
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 const osisRegex = /([\w]+).([\d]+)(?:.([\d]+))?/g; //(?<book>[\w]+).(?<chapter>[\d]+)(?:.(?<verse>[\d]+))?/g;
 function _osisToNucleus(ref) {
@@ -101,7 +116,7 @@ function _osisToNucleus(ref) {
     */
   let book = null;
   let chapter = null;
-  let verseRange = '';
+  let verseRange = "";
   let m;
   do {
     m = osisRegex.exec(ref);
@@ -116,13 +131,12 @@ function _osisToNucleus(ref) {
     }
   } while (m);
 
-  let scripture = 
-  {
+  let scripture = {
     bible_version_id: bibleVersion,
     bible_book_id: bookIds[book],
-    chapter: chapter,
+    chapter: chapter
   };
-  if (verseRange){
+  if (verseRange) {
     scripture.verses = verseRange;
   }
   return scripture;
