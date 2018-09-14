@@ -243,7 +243,7 @@ class nucleus {
         json: true,
         body: {
           playlist: {
-            title: name.replace("+", " "),
+            title: name.replace(/\+/g, " "),
             description: description,
             artwork: img.path
           }
