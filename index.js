@@ -111,18 +111,19 @@ var dbSource = null;
                     });
                 });
               });
-            }else{
+            } else {
               uploadIDs.push(database[series].items[item].nucleusID);
             }
           } //); //end items foreach
-          nucleusApi.addPlaylist(series, database[series].artwork, database[series].description).then(response => {
-            let playlistId = response.body.location.match(/[\d]+/g)[0];
-            database[series].playlistId = playlistId;
-            nucleusApi.addItemsToPlaylist(playlistId, uploadIDs).then(response => {
-              console.log(response);
-              database[series].itemsAdded = uploadIDs;
+          if (!database[series].playlistId && !database[series].itemsAdded)
+            nucleusApi.addPlaylist(series, database[series].artwork, database[series].description).then(response => {
+              let playlistId = response.body.location.match(/[\d]+/g)[0];
+              database[series].playlistId = playlistId;
+              nucleusApi.addItemsToPlaylist(playlistId, uploadIDs).then(response => {
+                console.log(response);
+                database[series].itemsAdded = uploadIDs;
+              });
             });
-          });
         } //end for series in db
         dbSource.saveDB(database);
       }); //End nucleus login promise chain
