@@ -181,20 +181,7 @@ class nucleus {
               description: sourceObj.description, //"God's Glory Alone | John 17:1-5, 20-26 "
               published_at: sourceObj.date, //"2017-10-29 01:00:00",
               artwork: sourceObj.imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
-              scriptures: [
-                {
-                  bible_version_id: 13,
-                  bible_book_id: 43,
-                  chapter: "17",
-                  verses: "1-5"
-                },
-                {
-                  bible_version_id: 13,
-                  bible_book_id: 43,
-                  chapter: "17",
-                  verses: "20-26"
-                }
-              ],
+              scriptures: sourceObj.scriptures,
               speakers: ["Adam Viramontes"],
               added_to_podcast: false,
               files: [],
@@ -402,10 +389,10 @@ class nucleus {
   }
   async getSermonEngineId() {
     const regex = /sermon_engine_id&quot;:([\d]+),/gm;
-    let id = await this.request(NUCLEUSROOT + "/admin/media").then(resp=> {
-        let matches = regex.exec(resp.body);
-        return Promise.resolve(matches[1]);
-      });
+    let id = await this.request(NUCLEUSROOT + "/admin/media").then(resp => {
+      let matches = regex.exec(resp.body);
+      return Promise.resolve(matches[1]);
+    });
     return id;
   }
   _getAuthenticationOptions() {
