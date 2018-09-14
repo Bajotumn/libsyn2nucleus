@@ -212,7 +212,8 @@ class nucleus {
         resolve({ path: imageSource.imageID });
       });
     } else {
-      let newImageSource = await this.getRedirectUrl(imageSource.artwork);
+      let url = imageSource.artwork || imageSource;
+      let newImageSource = await this.getRedirectUrl(url);
       return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image).then(body => {
         return JSON.parse(body);
       });
@@ -234,7 +235,7 @@ class nucleus {
         json: true,
         body: {
           playlist: {
-            title: name,
+            title: name.replace('+',' '),
             description: description,
             artwork: img.path
           }

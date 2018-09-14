@@ -49,13 +49,16 @@ const cheerio = require("cheerio"),
   request = require("sync-request"),
   fs = require("fs"),
   jsonfile = require("jsonfile"),
-  readline = require("readline-sync")
-  getScriptures = require(__dirname + '/../getscriptures');
+  readline = require("readline-sync");
+getScriptures = require(__dirname + "/../getscriptures");
 
 class libsyn {
   /* Interface implementation */
   beginConnect() {
-    this.subdomain = readline.question('Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
+    this.subdomain = "mosaicabq";
+    try {
+      subdomain = readline.question('Please enter the Libsyn *subdomain* you wish to migrate\nIf your domain is mychurch.libsyn.com just enter "mychurch": ');
+    } catch (e) {}
 
     if (checkSubdomainExistance(this.subdomain)) {
       console.log(`Got it! Let's migrate your sermons from ${this.subdomain}.libsyn.com to Nucleus`);
@@ -160,7 +163,7 @@ function getCategoryItems_sync(url, category) {
 }
 function normalizeOutput(input) {
   let pubDate = new Date(input.release_date).toISOString().match(/([\d]{4}-[\d]{2}-[\d]{2})/)[0] + " 12:00:00";
- 
+
   return {
     title: input.item_title,
     description: input.item_body_clean,
