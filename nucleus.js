@@ -382,12 +382,13 @@ class nucleus {
           accept: "*/*"
         },
         body: form
-      }).then(response => {
+      }).then(async response => {
         if (response.statusCode === 302 || response.statusCode === 200) {
           //302 redirect means login succeded
           let $ = cheerio.load(response.body);
           if (!$("form#existing_user").html()) {
             console.log("Logged in successfully...");
+            this.sermonEngineID = await this.getSermonEngineId();
             return Promise.resolve(true);
           } else {
             console.log("Login failed!");
@@ -398,6 +399,16 @@ class nucleus {
         }
       });
     });
+  }
+  async getSermonEngineId() {
+    const regex = /sermon_engine_id&quot;:([\d]+),/gm;
+    let id = await new Promise(resolve => {
+      this.request2(NUCLEUSROOT + "/admin/media", (err, resp, body) => {
+        let matches = regex.exec(body);
+        resolve(matches[1]);
+      });
+    });
+    return id;
   }
   _getAuthenticationOptions() {
     return this.request(NUCLEUSROOT + "/user/login", {
