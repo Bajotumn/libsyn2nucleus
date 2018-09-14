@@ -205,10 +205,18 @@ class nucleus {
     });
   }
   async uploadImage(imageSource) {
-    let newImageSource = await this.getRedirectUrl(imageSource);
-    return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image).then(body => {
-      return JSON.parse(body);
-    });
+    if (imageSource.imageID) {
+      //It's king of janky, but it works to just upload NEW images
+      console.log(`${imageSource.artwork} => ${imageSource.imageID}`);
+      return new Promise(resolve => {
+        resolve({ path: imageSource.imageID });
+      });
+    } else {
+      let newImageSource = await this.getRedirectUrl(imageSource.artwork);
+      return this._postFormData(newImageSource, "image", ENDPOINTS.upload.image).then(body => {
+        return JSON.parse(body);
+      });
+    }
   }
   addPlaylist(name, artwork, description) {
     return this.uploadImage(artwork).then(img => {

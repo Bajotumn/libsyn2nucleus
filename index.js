@@ -92,7 +92,7 @@ var dbSource = null;
                 let itemID = abody.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
                 database[series].items[item].nucleusID = itemID; //We'll check this in future runs to make sure we don't reupload audio
                 let imageID = "";
-                return nucleusApi.uploadImage(database[series].items[item].artwork).then(ibody => {
+                return nucleusApi.uploadImage(database[series].items[item]).then(ibody => {
                   imageID = ibody.path;
                   database[series].items[item].imageID = imageID; //We'll check this in future runs to make sure we don't reupload image
                   return nucleusApi
