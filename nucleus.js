@@ -176,9 +176,9 @@ class nucleus {
           body: {
             mediaItem: {
               id: sourceObj.nucleusID, //"1916"
-              sermon_engine_id: 244,
+              sermon_engine_id: this.sermonEngineID,
               title: sourceObj.title, //"God's Glory Alone | John 17:1-5, 20-26"
-              description: sourceObj.description, //"God's Glory Alone | John 17:1-5, 20-26 "
+              description: sourceObj.description || "", //"God's Glory Alone | John 17:1-5, 20-26 "
               published_at: sourceObj.date, //"2017-10-29 01:00:00",
               artwork: sourceObj.imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
               scriptures: sourceObj.scriptures,
