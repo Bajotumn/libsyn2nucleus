@@ -71,7 +71,7 @@ class libsyn {
   getDatabase() {
     let database = {};
 
-    let useCache = true;
+    let useCache = false;
     let databaseFound = false;
     try {
       databaseFound = fs.existsSync(this.databaseFile);

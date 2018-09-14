@@ -200,9 +200,17 @@ class nucleus {
     });
   }
   async uploadAudioFile(fileSource) {
-    return this._postFormData(fileSource, "audiofile", ENDPOINTS.upload.audio).then(body => {
-      return JSON.parse(body);
-    });
+    if (fileSource.itemID) {
+      return new Promise(resolve => {
+        resolve({
+          location: "/admin/media/edit/" + fileSource.itemID
+        });
+      });
+    } else {
+      return this._postFormData(fileSource.url, "audiofile", ENDPOINTS.upload.audio).then(body => {
+        return JSON.parse(body);
+      });
+    }
   }
   async uploadImage(imageSource) {
     if (imageSource.imageID) {
@@ -235,7 +243,7 @@ class nucleus {
         json: true,
         body: {
           playlist: {
-            title: name.replace('+',' '),
+            title: name.replace("+", " "),
             description: description,
             artwork: img.path
           }

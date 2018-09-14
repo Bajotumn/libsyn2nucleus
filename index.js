@@ -88,7 +88,7 @@ var dbSource = null;
           for (item in database[series].items) {
             if (!database[series].items[item].nucleusID || !database[series].items[item].editComplete) {
               //Work on this later to allow for failures in edit stage
-              let result = await nucleusApi.uploadAudioFile(database[series].items[item].url).then(abody => {
+              let result = await nucleusApi.uploadAudioFile(database[series].items[item]).then(abody => {
                 let itemID = abody.location.match(/\/admin\/media\/edit\/([\d]+)/)[1];
                 database[series].items[item].nucleusID = itemID; //We'll check this in future runs to make sure we don't reupload audio
                 let imageID = "";
@@ -132,6 +132,7 @@ var dbSource = null;
                 database[series].itemsAdded = uploadIDs;
               });
             });
+          dbSource.saveDB(database); //Save after successful series
         } //end for series in db
         dbSource.saveDB(database);
       }); //End nucleus login promise chain
