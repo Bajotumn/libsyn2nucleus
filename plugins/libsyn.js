@@ -49,8 +49,9 @@ const cheerio = require("cheerio"),
   request = require("sync-request"),
   fs = require("fs"),
   jsonfile = require("jsonfile"),
-  readline = require("readline-sync");
-getScriptures = require(__dirname + "/../getscriptures");
+  readline = require("readline-sync"),
+  getScriptures = require(__dirname + "/../getscriptures"),
+  colors = require("colors");
 
 class libsyn {
   /* Interface implementation */
@@ -71,7 +72,7 @@ class libsyn {
   getDatabase() {
     let database = {};
 
-    let useCache = false;
+    let useCache = true;
     let databaseFound = false;
     try {
       databaseFound = fs.existsSync(this.databaseFile);
@@ -136,7 +137,7 @@ function getCategories_sync(url) {
       }
     } while (match);
   } else {
-    console.log(`Error = ${res.error} code = ${res.statusCode}`);
+    console.error(`Error = ${res.error} code = ${res.statusCode}`);
   }
   console.timeEnd("Retrieve categories from libsyn");
   return categories;

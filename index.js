@@ -2,13 +2,17 @@ const cheerio = require("cheerio"),
   request = require("sync-request"),
   fs = require("fs"),
   readline = require("readline-sync"),
-  nucleus = require("./nucleus.js");
+  nucleus = require("./nucleus.js"),
+  colors = require("colors");
 var dbSource = null;
 (async () => {
   let availablePlugins = loadSourcePlugins();
-  let pluginSelection = 0; //readline.keyInSelect(availablePlugins.map(p=>{return p.name}), "Which source plugin? ");
+  let pluginSelection = 0; 
+  if(availablePlugins>1){
+    pluginSelection = readline.keyInSelect(availablePlugins.map(p=>{return p.name}), "Which source plugin? ");
+  }
   if (pluginSelection !== undefined) {
-    console.log(`Source set to ${availablePlugins[pluginSelection]}`);
+    console.log(`Source set to ${availablePlugins[pluginSelection].name.yellow}`);
     dbSource = new (require(availablePlugins[pluginSelection].path))();
   }
   if (dbSource.beginConnect()) {
@@ -23,7 +27,7 @@ var dbSource = null;
       if (artworklessCount) {
         let addArtwork = false;
         try {
-          addArtwork = readline.keyInYN(`There are ${artworklessCount} series without artwork. Add some now? `);
+          addArtwork = readline.keyInYN(`There are ${artworklessCount.red} series without artwork. Add some now? `);
         } catch (e) {}
         if (addArtwork) {
           for (series in database) {
@@ -33,7 +37,7 @@ var dbSource = null;
               do {
                 let skipped = false;
                 skipped =
-                  (catUrl = readline.question(`Enter url (or blank) for "${series}": `, {
+                  (catUrl = readline.question(`Enter url (or blank) for "${series.yellow}": `, {
                     limit: [
                       /(?!mailto:)(?:(?:http|https|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?:(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[0-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))|localhost)(?::\d{2,5})?(?:(\/|\?|#)[^\s]*)?/i,
                       "",
@@ -42,7 +46,7 @@ var dbSource = null;
                     limitMessage: "That's not a valid url"
                   })) == "";
                 if (skipped) {
-                  console.log("Okay, no artwork for " + series);
+                  console.log("Okay, no artwork for " + series.yellow);
                   continue;
                 }
                 urlWorks = urlOk(catUrl);
@@ -61,7 +65,7 @@ var dbSource = null;
       let username, password;
       if (fs.existsSync(__dirname + "/auth.cfg")) {
         let auth = fs.readFileSync(__dirname + "/auth.cfg").toString();
-        console.log("Loaded dev username/password from ./auth.cfg");
+        console.log("Loaded dev username/password from ./auth.cfg".yellow);
         auth = auth.split("\n");
         username = auth[0].trim();
         password = auth[1].trim();
@@ -108,7 +112,7 @@ var dbSource = null;
                   return nucleusApi
                     .editItem(itemID, database[series].items[item], imageID)
                     .then(response => {
-                      console.log(database[series].items[item].title + " finished!");
+                      console.log(database[series].items[item].title.yellow + " finished!".green);
                       uploadIDs.push(itemID);
                       database[series].items[item].editComplete = true; //We'll check this in future runs to make sure we don't reedit episodes
                       return Promise.resolve(true);
@@ -125,13 +129,16 @@ var dbSource = null;
             }
             dbSource.saveDB(database);
           } //); //end items foreach
-          if (!database[series].playlistId && !database[series].itemsAdded)
+
+          if (!database[series].complete)
             nucleusApi.addPlaylist(series, database[series].artwork, database[series].description).then(response => {
               let playlistId = response.body.location.match(/[\d]+/g)[0];
               database[series].playlistId = playlistId;
               nucleusApi.addItemsToPlaylist(playlistId, uploadIDs).then(response => {
                 console.log(response);
                 database[series].itemsAdded = uploadIDs;
+                database[series].complete = true;
+                dbSource.saveDB(database);
               });
             });
           dbSource.saveDB(database); //Save after successful series

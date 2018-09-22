@@ -6,7 +6,8 @@ const cheerio = require("cheerio"),
   FormData = require("form-data"),
   streamlength = require("stream-length"),
   getBody = require("body"),
-  jsonBody = require("body/json");
+  colors = require('colors');
+const waitTime = 20;
 
 const NUCLEUSROOT = "https://nucleus.church";
 const ENDPOINTS = {
@@ -183,7 +184,7 @@ class nucleus {
               artwork: sourceObj.imageID, //uploads/ad2dda70df208b611a22891458df1010b1fd6954.jpg
               scriptures: sourceObj.scriptures,
               speakers: ["Adam Viramontes"],
-              added_to_podcast: false,
+              added_to_podcast: true,
               files: [],
               tags: []
             }
@@ -207,14 +208,15 @@ class nucleus {
         });
       });
     } else {
-      return this._postFormData(fileSource.url, "audiofile", ENDPOINTS.upload.audio).then(body => {
+      let newAudioSource = fileSource.url; //await this.getRedirectUrl(fileSource.url);
+      return this._postFormData(newAudioSource, "audiofile", ENDPOINTS.upload.audio).then(body => {
         return JSON.parse(body);
       });
     }
   }
   async uploadImage(imageSource) {
     if (imageSource.imageID) {
-      //It's king of janky, but it works to just upload NEW images
+      //It's kind of janky, but it works to just upload NEW images
       console.log(`${imageSource.artwork} => ${imageSource.imageID}`);
       return new Promise(resolve => {
         resolve({ path: imageSource.imageID });
@@ -304,10 +306,14 @@ class nucleus {
    * @param {ENDPOINTS.upload} endpoint Endpoint path
    * @param {object} params applyToken: add token to form, fileName: override filename, contentType: override Content-Type form header
    */
-  async _postFormData(sourceURL, formName, endpoint, params) {
-    //let csrfToken = await this.getCSRFToken(NUCLEUSROOT + "/admin/media"); //Possibly not necessary
+  async _postFormData(sourceURL, formName, endpoint, params, failures = 0) {
+    if (failures === 3) {
+      console.error("Maximum retry limit (3) reached on _postFormData()");
+      return null;
+    }
+
     let formData = new FormData();
-    let srcStream = require("request")(sourceURL, {
+    let srcStream = require("request")(await sourceURL, {
       followRedirect: true,
       followAllRedirects: true
     });
@@ -316,7 +322,11 @@ class nucleus {
     params = params || {};
     let applyToken = params.applyToken || false,
       fileName = params.fileName || sourceURL.substr(sourceURL.lastIndexOf("/") + 1),
-      contentType = params.contentType || srcStream.getHeader("content-type");
+      contentType =
+        params.contentType ||
+        srcStream.getHeader("content-type") ||
+        (endpoint === ENDPOINTS.upload.image ? "image/jpeg" : null) ||
+        (endpoint === ENDPOINTS.upload.audio ? "audio/mp3" : null);
 
     try {
       await streamlength(srcStream).then(len => {
@@ -344,12 +354,11 @@ class nucleus {
       cookie: cookie
     });
 
-    console.dir(`Processing formData...${sourceURL} formName: ${formName} endPoint: ${endpoint}`);
+    console.dir(`Processing formData...${sourceURL.yellow} formName: ${formName.yellow} endPoint: ${endpoint.yellow}`);
     return new Promise((resolve, reject) => {
       formData.submit(
         {
           agent: this.agent,
-
           protocol: "https:",
           host: "nucleus.church",
           path: endpoint,
@@ -368,8 +377,21 @@ class nucleus {
           }
         }
       );
+    }).catch(async e => {
+      console.error(e);
+      //Retry once. then try downloading the file to temp, and uploading from local storage.
+      console.log(`Waiting ${waitTime} seconds before retrying...`);
+      sleep(waitTime);
+      //if (failures < 2) {
+      return this._postFormData(sourceURL, formName, endpoint, params, failures++);
+      //} else {
+      //  let localUrl = _getLocalStoragePath(sourceURL);
+      //  await _saveSourceLocaly(sourceURL, localUrl);
+      //  return this._postFormData(localUrl, formName, endpoint, params, failures++);
+      //}
     });
   }
+
   login() {
     return this._getAuthenticationOptions().then(authOpts => {
       this.csrf_token = authOpts.token;
@@ -428,5 +450,40 @@ class nucleus {
       }
     });
   }
+  _getLocalStoragePath(source) {
+    let name = source.match(/[^\/?#]+(?=$|[?#])/)[0];
+    let temp = fs.mkdtempSync("./temp/local-");
+    return `${temp}/${name}`;
+  }
+  _saveSourceLocaly(source, dest) {
+    console.log(`Saving ${source} to local storage...${dest}`);
+    const http = require("http"),
+      fs = require("fs");
+
+    return new Promise(async (resolve, reject) => {
+      let url = await this.getRedirectUrl(source);
+      let file = fs.createWriteStream(dest);
+      http
+        .get(url, function(response) {
+          response.pipe(file);
+          file.on("finish", function() {
+            console.log("Done.");
+            file.close(resolve); // close() is async, call cb after close completes.
+          });
+        })
+        .on("error", function(err) {
+          // Handle errors
+          fs.unlink(dest); // Delete the file async. (But we don't check the result)
+          console.error(err);
+          reject(err.message);
+        });
+    });
+  }
+}
+function msleep(n) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+}
+function sleep(n) {
+  msleep(n * 1000);
 }
 module.exports = nucleus;
